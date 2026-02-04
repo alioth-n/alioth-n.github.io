@@ -1,6 +1,386 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin: 20px 0;
+            color: #f0a500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .question-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(240, 165, 0, 0.3);
+        }
+
+        .question-input-container {
+            margin-bottom: 15px;
+        }
+
+        .question-label {
+            font-size: 1.2em;
+            color: #f0a500;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(240, 165, 0, 0.5);
+            border-radius: 10px;
+            color: #e0e0e0;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .question-input:focus {
+            border-color: #f0a500;
+            box-shadow: 0 0 15px rgba(240, 165, 0, 0.3);
+        }
+
+        .question-display {
+            font-size: 1.3em;
+            color: #f0a500;
+            text-align: center;
+            padding: 15px;
+            background: rgba(240, 165, 0, 0.1);
+            border-radius: 10px;
+            border: 2px solid #f0a500;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(240, 165, 0, 0.3);
+        }
+
+        .status {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #f0a500;
+        }
+
+        .instruction {
+            text-align: center;
+            font-size: 1em;
+            color: #b0b0b0;
+        }
+
+        .grid-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px auto;
+            max-width: 900px;
+        }
+
+        .grid-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .grid-cell {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(240, 165, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            position: relative;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .grid-cell.small {
+            width: 150px;
+        }
+
+        .grid-cell.large {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .grid-cell.active {
+            background: rgba(240, 165, 0, 0.1);
+            border-color: #f0a500;
+            box-shadow: 0 0 20px rgba(240, 165, 0, 0.3);
+        }
+
+        .grid-cell-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 0.7em;
+            color: #808080;
+        }
+
+        .sticks-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .stick {
+            width: 3px;
+            height: 30px;
+            background: linear-gradient(to bottom, #8B4513, #D2691E);
+            border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stick.horizontal {
+            width: 30px;
+            height: 3px;
+            transform: rotate(45deg);
+        }
+
+        .stick-count {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #f0a500;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 5px;
+        }
+
+        /* 滑桿容器 - 整合到中間格子 */
+        .dividing-interface {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .piles-display {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+            align-items: flex-end;
+            min-height: 150px;
+        }
+
+        .pile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .pile-label {
+            font-size: 1em;
+            color: #f0a500;
+            margin-bottom: 10px;
+        }
+
+        .pile-sticks {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 2px;
+            justify-content: center;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f0a500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(240, 165, 0, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(240, 165, 0, 0.7);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f0a500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(240, 165, 0, 0.5);
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .button {
+            padding: 12px 35px;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #f0a500, #e09200);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(240, 165, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(240, 165, 0, 0.6);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.5;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1em;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .results {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 1px solid rgba(240, 165, 0, 0.3);
+        }
+
+        .results-title {
+            text-align: center;
+            font-size: 1.5em;
+            color: #f0a500;
+            margin-bottom: 15px;
+        }
+
+        .results-grid {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 10px;
+            margin-top: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-item {
+            background: rgba(240, 165, 0, 0.1);
+            border: 2px solid #f0a500;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-label {
+            font-size: 1.1em;
+            color: #e0e0e0;
+        }
+
+        .result-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #f0a500;
+        }
+
+        @keyframes moveStick {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .stick.moving {
+            animation: moveStick 0.5s ease;
+        }
+    </style>
 
 <title>電腦作品頁</title>
 <link rel="stylesheet" type="text/css" href="page1.css" />
@@ -13,11 +393,475 @@
     <li><a class="active" href="">電腦作品頁</a></li>
     <li><a href="page3.html">流浪地球</a></li>
 </ul>
-<hr>
-  <h2>HTML心得</h2>
-<hr>
-  <h2>自主學習計畫</h2>
-<hr>
-  <h2>網頁更新日誌</h2>
+    <div class="container">
+        <h1>☯ 易經大衍占卜 ☯</h1>
+
+        <!-- 問題輸入/顯示面板 -->
+        <div class="question-panel" id="questionPanel">
+            <div class="question-input-container" id="questionInputContainer">
+                <label class="question-label">請輸入您的問題：</label>
+                <input type="text" class="question-input" id="questionInput" placeholder="例如：今年事業發展如何？">
+            </div>
+            <div class="question-display" id="questionDisplay" style="display: none;"></div>
+        </div>
+
+        <div class="info-panel">
+            <div class="status" id="status">請先輸入問題，然後開始占卜</div>
+            <div class="instruction" id="instruction">輸入問題後點擊「開始占卜」</div>
+        </div>
+
+        <!-- 錯誤訊息 -->
+        <div id="errorMessage" style="display: none;"></div>
+
+        <!-- 佈局區域 -->
+        <div class="grid-layout">
+            <!-- 第一排：左上、中上、右上 -->
+            <div class="grid-row">
+                <div class="grid-cell small" id="cell-top-left">
+                    <span class="grid-cell-label">左上</span>
+                    <div class="sticks-area" id="sticks-top-left"></div>
+                </div>
+                <div class="grid-cell small" id="cell-top-center">
+                    <span class="grid-cell-label">中上</span>
+                    <div class="sticks-area" id="sticks-top-center"></div>
+                </div>
+                <div class="grid-cell small" id="cell-top-right">
+                    <span class="grid-cell-label">右上</span>
+                    <div class="sticks-area" id="sticks-top-right"></div>
+                </div>
+            </div>
+
+            <!-- 第二排：中間大格子（合併的） -->
+            <div class="grid-row">
+                <div class="grid-cell large" id="cell-middle">
+                    <span class="grid-cell-label">操作區</span>
+                    <div id="middleContent"></div>
+                </div>
+            </div>
+
+            <!-- 第三排：左下、中下、右下 -->
+            <div class="grid-row">
+                <div class="grid-cell small" id="cell-bottom-left">
+                    <span class="grid-cell-label">左下</span>
+                    <div class="sticks-area" id="sticks-bottom-left"></div>
+                </div>
+                <div class="grid-cell small" id="cell-bottom-center">
+                    <span class="grid-cell-label">中下</span>
+                    <div class="sticks-area" id="sticks-bottom-center"></div>
+                </div>
+                <div class="grid-cell small" id="cell-bottom-right">
+                    <span class="grid-cell-label">右下</span>
+                    <div class="sticks-area" id="sticks-bottom-right"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="button" id="startButton">開始占卜</button>
+            <button class="button" id="clearButton" style="display: none;">清除重來</button>
+        </div>
+
+        <div class="results" id="results" style="display: none;">
+            <div class="results-title">占卜結果</div>
+            <div class="results-grid" id="resultsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // 遊戲狀態
+        let gameState = {
+            question: '',
+            currentYao: 0,
+            currentRound: 0,
+            totalSticks: 49,
+            results: [],
+            leftPile: 0,
+            rightPile: 0,
+            phase: 'idle'
+        };
+
+        // DOM 元素
+        const questionInput = document.getElementById('questionInput');
+        const questionInputContainer = document.getElementById('questionInputContainer');
+        const questionDisplay = document.getElementById('questionDisplay');
+        const middleContent = document.getElementById('middleContent');
+        const errorMessage = document.getElementById('errorMessage');
+        const startButton = document.getElementById('startButton');
+        const clearButton = document.getElementById('clearButton');
+        const status = document.getElementById('status');
+        const instruction = document.getElementById('instruction');
+        const results = document.getElementById('results');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        const cells = {
+            'top-left': document.getElementById('sticks-top-left'),
+            'top-center': document.getElementById('sticks-top-center'),
+            'top-right': document.getElementById('sticks-top-right'),
+            'bottom-left': document.getElementById('sticks-bottom-left'),
+            'bottom-center': document.getElementById('sticks-bottom-center'),
+            'bottom-right': document.getElementById('sticks-bottom-right')
+        };
+
+        // 渲染木棒
+        function renderSticks(cellId, count, horizontal = false) {
+            const cell = cells[cellId];
+            cell.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const stick = document.createElement('div');
+                stick.className = horizontal ? 'stick horizontal' : 'stick';
+                cell.appendChild(stick);
+            }
+
+            // 添加數字顯示
+            const parentCell = cell.parentElement;
+            let countDisplay = parentCell.querySelector('.stick-count');
+            if (countDisplay) countDisplay.remove();
+            
+            if (count > 0) {
+                countDisplay = document.createElement('div');
+                countDisplay.className = 'stick-count';
+                countDisplay.textContent = count;
+                parentCell.appendChild(countDisplay);
+            }
+        }
+
+        // 清空格子
+        function clearCell(cellId) {
+            cells[cellId].innerHTML = '';
+            const countDisplay = cells[cellId].parentElement.querySelector('.stick-count');
+            if (countDisplay) countDisplay.remove();
+        }
+
+        // 清空所有下方格子
+        function clearBottomRow() {
+            clearCell('bottom-left');
+            clearCell('bottom-center');
+            clearCell('bottom-right');
+        }
+
+        // 高亮格子
+        function highlightCell(cellElement) {
+            document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('active'));
+            if (cellElement) {
+                cellElement.classList.add('active');
+            }
+        }
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            errorMessage.className = 'error-message';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // 創建分堆界面
+        function createDividingInterface() {
+            middleContent.innerHTML = `
+                <div class="dividing-interface">
+                    <div class="piles-display">
+                        <div class="pile">
+                            <div class="pile-label">左堆</div>
+                            <div class="pile-sticks" id="leftPileSticks"></div>
+                        </div>
+                        <div class="pile">
+                            <div class="pile-label">右堆</div>
+                            <div class="pile-sticks" id="rightPileSticks"></div>
+                        </div>
+                    </div>
+                    <input type="range" min="4" max="${gameState.totalSticks - 4}" value="${Math.floor(gameState.totalSticks / 2)}" class="slider" id="stickSlider">
+                    <button class="button" id="confirmButton">確認分配</button>
+                </div>
+            `;
+
+            const slider = document.getElementById('stickSlider');
+            const leftPileSticks = document.getElementById('leftPileSticks');
+            const rightPileSticks = document.getElementById('rightPileSticks');
+            const confirmButton = document.getElementById('confirmButton');
+
+            // 滑桿變化事件
+            slider.addEventListener('input', function() {
+                const leftValue = parseInt(this.value);
+                const rightValue = gameState.totalSticks - leftValue;
+                
+                renderPileSticks(leftPileSticks, leftValue);
+                renderPileSticks(rightPileSticks, rightValue);
+            });
+
+            // 初始顯示
+            const initialLeft = parseInt(slider.value);
+            renderPileSticks(leftPileSticks, initialLeft);
+            renderPileSticks(rightPileSticks, gameState.totalSticks - initialLeft);
+
+            // 確認按鈕
+            confirmButton.addEventListener('click', () => confirmDivision(slider));
+        }
+
+        // 渲染堆中的木棒
+        function renderPileSticks(container, count) {
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const stick = document.createElement('div');
+                stick.className = 'stick';
+                container.appendChild(stick);
+            }
+        }
+
+        // 顯示處理中的木棒
+        function showProcessingSticks(count) {
+            middleContent.innerHTML = '';
+            const sticksArea = document.createElement('div');
+            sticksArea.className = 'sticks-area';
+            
+            for (let i = 0; i < count; i++) {
+                const stick = document.createElement('div');
+                stick.className = 'stick';
+                sticksArea.appendChild(stick);
+            }
+            
+            middleContent.appendChild(sticksArea);
+        }
+
+        // 初始化占卜
+        function initializeDivination() {
+            // 檢查是否輸入問題
+            const question = questionInput.value.trim();
+            if (!question) {
+                showError('請先輸入問題！');
+                return;
+            }
+
+            gameState = {
+                question: question,
+                currentYao: 0,
+                currentRound: 0,
+                totalSticks: 49,
+                results: [],
+                leftPile: 0,
+                rightPile: 0,
+                phase: 'idle'
+            };
+
+            // 顯示問題
+            questionDisplay.textContent = `問題：${question}`;
+            questionInputContainer.style.display = 'none';
+            questionDisplay.style.display = 'flex';
+
+            // 清空所有格子
+            Object.keys(cells).forEach(clearCell);
+            middleContent.innerHTML = '';
+            
+            // 放1根在中上位置
+            renderSticks('top-center', 1);
+            gameState.totalSticks = 49;
+
+            status.textContent = `第 ${gameState.currentYao + 1} 爻 - 第 ${gameState.currentRound + 1} 輪`;
+            instruction.textContent = '請將木棒分成兩堆';
+
+            startButton.style.display = 'none';
+            clearButton.style.display = 'inline-block';
+
+            startNextRound();
+        }
+
+        // 開始下一輪
+        function startNextRound() {
+            clearBottomRow();
+            middleContent.innerHTML = '';
+
+            // 顯示所有木棒
+            showProcessingSticks(gameState.totalSticks);
+            highlightCell(document.getElementById('cell-middle'));
+
+            // 短暫延遲後顯示分堆界面
+            setTimeout(() => {
+                createDividingInterface();
+                gameState.phase = 'dividing';
+            }, 500);
+        }
+
+        // 確認分配
+        async function confirmDivision(slider) {
+            if (gameState.phase !== 'dividing') return;
+
+            const leftValue = parseInt(slider.value);
+            const rightValue = gameState.totalSticks - leftValue;
+
+            // 檢查是否有任一堆少於4根
+            if (leftValue < 4 || rightValue < 4) {
+                showError('每一堆至少要有4根木棒！請重新分配。');
+                return;
+            }
+
+            gameState.phase = 'processing';
+
+            // 變數 a 儲存左堆，變數 b 儲存右堆
+            let a = leftValue;
+            let b = rightValue;
+
+            // 清空中間區域
+            middleContent.innerHTML = '';
+            await sleep(300);
+
+            // 步驟1: 左堆取1根放到左下
+            a = a - 1;
+            renderSticks('bottom-left', 1);
+            await sleep(800);
+
+            // 步驟2: 左堆除4取餘數，放到中下
+            const leftRemainder = a % 4 === 0 ? 4 : a % 4;
+            a = a - leftRemainder;
+            renderSticks('bottom-center', leftRemainder);
+            await sleep(800);
+
+            // 步驟3: 右堆除4取餘數，放到右下
+            const rightRemainder = b % 4 === 0 ? 4 : b % 4;
+            b = b - rightRemainder;
+            renderSticks('bottom-right', rightRemainder);
+            await sleep(800);
+
+            // 步驟4: 將下方三個位置的木棒(共1+leftRemainder+rightRemainder根)移到左上角橫放
+            const totalBottom = 1 + leftRemainder + rightRemainder;
+            clearBottomRow();
+            const currentTopLeft = cells['top-left'].querySelectorAll('.stick').length;
+            clearCell('top-left');
+            renderSticks('top-left', currentTopLeft + totalBottom, true);
+            await sleep(800);
+
+            // 合併剩餘木棒
+            gameState.totalSticks = a + b;
+            showProcessingSticks(gameState.totalSticks);
+            await sleep(500);
+
+            // 檢查是否完成三輪
+            gameState.currentRound++;
+            
+            if (gameState.currentRound >= 3) {
+                // 完成一爻
+                const yaoValue = gameState.totalSticks / 4;
+                gameState.results.push(yaoValue);
+                
+                status.textContent = `第 ${gameState.currentYao + 1} 爻完成！得到數字：${yaoValue}`;
+                instruction.textContent = gameState.currentYao < 5 ? '點擊「繼續」進行下一爻' : '占卜完成！';
+                
+                // 顯示當前結果
+                updateResults();
+                
+                gameState.currentYao++;
+                gameState.currentRound = 0;
+                gameState.totalSticks = 49;
+
+                if (gameState.currentYao >= 6) {
+                    // 完成所有六爻
+                    finishDivination();
+                } else {
+                    // 準備下一爻
+                    startButton.textContent = '繼續下一爻';
+                    startButton.style.display = 'inline-block';
+                    startButton.disabled = false;
+                    middleContent.innerHTML = '';
+                    highlightCell(null);
+                }
+            } else {
+                // 繼續下一輪
+                status.textContent = `第 ${gameState.currentYao + 1} 爻 - 第 ${gameState.currentRound + 1} 輪`;
+                instruction.textContent = '請將木棒分成兩堆';
+                await sleep(500);
+                startNextRound();
+            }
+        }
+
+        // 更新結果顯示
+        function updateResults() {
+            resultsGrid.innerHTML = '';
+            gameState.results.forEach((num, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+                itemDiv.innerHTML = `
+                    <div class="result-label">第 ${index + 1} 爻</div>
+                    <div class="result-number">${num}</div>
+                `;
+                resultsGrid.appendChild(itemDiv);
+            });
+            results.style.display = 'block';
+        }
+
+        // 完成占卜
+        function finishDivination() {
+            status.textContent = '占卜完成！';
+            instruction.textContent = '六個數字已全部得出';
+            startButton.style.display = 'none';
+            middleContent.innerHTML = '';
+            highlightCell(null);
+        }
+
+        // 清除重來
+        function clearAll() {
+            // 重置遊戲狀態
+            gameState = {
+                question: '',
+                currentYao: 0,
+                currentRound: 0,
+                totalSticks: 49,
+                results: [],
+                leftPile: 0,
+                rightPile: 0,
+                phase: 'idle'
+            };
+
+            // 清空所有格子
+            Object.keys(cells).forEach(clearCell);
+            middleContent.innerHTML = '';
+
+            // 顯示問題輸入
+            questionInput.value = '';
+            questionInputContainer.style.display = 'block';
+            questionDisplay.style.display = 'none';
+
+            // 重置按鈕
+            startButton.textContent = '開始占卜';
+            startButton.style.display = 'inline-block';
+            clearButton.style.display = 'none';
+
+            // 隱藏結果
+            results.style.display = 'none';
+            resultsGrid.innerHTML = '';
+
+            // 重置狀態文字
+            status.textContent = '請先輸入問題，然後開始占卜';
+            instruction.textContent = '輸入問題後點擊「開始占卜」';
+
+            // 放回初始木棒
+            renderSticks('top-center', 1);
+        }
+
+        // 開始按鈕
+        startButton.addEventListener('click', function() {
+            if (this.textContent === '開始占卜') {
+                initializeDivination();
+            } else {
+                // 繼續下一爻
+                this.style.display = 'none';
+                // 清空上一爻的左上角木棒
+                clearCell('top-left');
+                renderSticks('top-center', 1);
+                startNextRound();
+            }
+        });
+
+        // 清除按鈕
+        clearButton.addEventListener('click', clearAll);
+
+        // 延遲函數
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 初始化
+        renderSticks('top-center', 1);
+    </script>
 </body>
 </html>
