@@ -3,7 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易經大衍占卜</title>
+    
+    <!-- 引入易經文本數據庫 -->
+    <script src="yijing-text.js"></script>
+    
     <style>
+        /* 導航列樣式 */
+        .ul1 {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid #e7e7e7;
+            background-color: #f3f3f3;
+        }
+        
+        .ul1 li {
+            float: left;
+        }
+        
+        .ul1 li a {
+            display: block;
+            color: #666;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        
+        .ul1 li a:hover:not(.active) {
+            background-color: #ddd;
+        }
+        
+        .ul1 li a.active {
+            color: white;
+            background-color: #4CAF50;
+        }
+        
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* 主要樣式 */
+        /* Google AdSense 保留欄位 */
+        .adsense-placeholder {
+            display: none; /* 目前隱藏，申請後改為 block */
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(240, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 100px;
+        }
+        
+        .adsense-placeholder-text {
+            color: #808080;
+            font-size: 0.9em;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -529,58 +588,29 @@
             color: #f0a500;
             font-size: 1.2em;
         }
-
-.ul1 {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    border: 1px solid #e7e7e7;
-    background-color: #f3f3f3;
-}
-
-
-li a {
-    float: left;
-    display: block;
-    color: #666;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-li a:hover:not(.active) {
-    background-color: #ddd;
-}
-
-li a.active {
-    color: white;
-    background-color: #4CAF50;
-}
-img {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-</style>
-
-<title>電腦作品頁</title>
+    </style>
 </head>
 <body>
+    <!-- 導航列 -->
+    <ul class="ul1">
+        <li><a href="../index.html">首頁-介紹頁</a></li>
+        <li><a href="page1.html">文章作品頁</a></li>
+        <li><a class="active" href="">電腦作品頁</a></li>
+        <li><a href="page3.html">流浪地球</a></li>
+    </ul>
 
-<ul class="ul1">
-    <li><a href="../index.html">首頁-介紹頁</a></li>
-    <li><a href="page1.html">文章作品頁</a></li>
-    <li><a class="active" href="">電腦作品頁</a></li>
-    <li><a href="page3.html">流浪地球</a></li>
-</ul>
-<hr>
     <div class="container">
         <h1>☯ 易經大衍占卜 ☯</h1>
 
         <!-- ==================== 畫面1: 問題輸入 ==================== -->
         <div class="screen active" id="screen1">
             <div class="question-screen">
+                <!-- Google AdSense 保留欄位 -->
+                <div class="adsense-placeholder">
+                    <div class="adsense-placeholder-text">Google AdSense 廣告位置</div>
+                    <!-- 申請AdSense後，將廣告代碼放在這裡 -->
+                </div>
+
                 <div class="question-panel">
                     <h2 class="question-title">誠心問卜</h2>
                     <p class="question-subtitle">請靜心思考您的問題，以誠摯的心態進行占卜。<br>問題越具體明確，占卜結果越有參考價值。</p>
@@ -598,6 +628,12 @@ img {
                 <div class="info-panel">
                     <div class="status" id="status">準備中...</div>
                     <div class="instruction" id="instruction">系統準備中</div>
+                </div>
+
+                <!-- 即時結果顯示 -->
+                <div class="results-panel" id="liveResults" style="display: none; margin-bottom: 20px;">
+                    <h3 style="text-align: center; color: #f0a500; font-size: 1.3em; margin-bottom: 15px;">目前結果</h3>
+                    <div class="results-grid" id="liveResultsGrid"></div>
                 </div>
 
                 <div id="errorMessage" style="display: none;"></div>
@@ -656,6 +692,12 @@ img {
             <div class="result-screen">
                 <div class="question-display" id="resultQuestionDisplay"></div>
 
+                <!-- Google AdSense 保留欄位 -->
+                <div class="adsense-placeholder">
+                    <div class="adsense-placeholder-text">Google AdSense 廣告位置</div>
+                    <!-- 申請AdSense後，將廣告代碼放在這裡 -->
+                </div>
+
                 <div class="results-panel">
                     <h2 class="results-title">占卜結果</h2>
                     <div class="results-grid" id="resultsGrid"></div>
@@ -672,37 +714,26 @@ img {
             <div class="survey-screen">
                 <div class="question-display" id="surveyQuestionDisplay"></div>
 
-                <div class="survey-intro">
-                    <h2>協助我們提升解讀能力</h2>
-                    <p>可以佔用兩分鐘填個問卷，讓您的「占卜結果」供我們研究嗎？</p>
-                    <p>我們提供<strong>簡易問卷</strong>和<strong>詳盡問卷</strong>兩種選擇，您的回答有助於提升我們的解讀能力！</p>
-                    <p>您填的表單會回信給您，可以隨時更改答案。</p>
-                    
-                    <div class="survey-options">
-                        <button class="button" id="showSimpleSurvey">填寫簡易問卷</button>
-                        <button class="button" id="showDetailedSurvey">填寫詳盡問卷</button>
-                        <button class="button secondary" id="skipToFeedback">跳過，直接填寫使用心得</button>
-                    </div>
+                <!-- Google AdSense 保留欄位 -->
+                <div class="adsense-placeholder">
+                    <div class="adsense-placeholder-text">Google AdSense 廣告位置</div>
+                    <!-- 申請AdSense後，將廣告代碼放在這裡 -->
                 </div>
 
-                <div class="survey-container" id="resultSurveyContainer" style="display: none;">
-                    <!-- 
-                    ==================== Google 表單嵌入位置 ====================
-                    請將您的 Google 表單嵌入代碼放在這裡
-                    
-                    簡易問卷範例：
-                    <iframe src="https://docs.google.com/forms/d/e/YOUR_SIMPLE_FORM_ID/viewform?embedded=true" 
-                            width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0">
-                        載入中…
-                    </iframe>
-                    
-                    詳盡問卷範例：
-                    <iframe src="https://docs.google.com/forms/d/e/YOUR_DETAILED_FORM_ID/viewform?embedded=true" 
-                            width="100%" height="1200" frameborder="0" marginheight="0" marginwidth="0">
-                        載入中…
-                    </iframe>
-                    ==================== Google 表單嵌入位置 ====================
-                    -->
+                <!-- 易經原文顯示區 -->
+                <div class="survey-intro" style="margin-bottom: 30px;">
+                    <h2 style="color: #f0a500; margin-bottom: 20px;">易經解讀</h2>
+                    <div id="yijingTextDisplay" style="
+                        background: rgba(0, 0, 0, 0.3);
+                        padding: 25px;
+                        border-radius: 10px;
+                        white-space: pre-wrap;
+                        line-height: 2;
+                        font-size: 1.05em;
+                        max-height: 500px;
+                        overflow-y: auto;
+                        border: 1px solid rgba(240, 165, 0, 0.3);
+                    "></div>
                 </div>
 
                 <div class="navigation-buttons">
@@ -826,6 +857,28 @@ img {
             '011011': '巽卦巽為風䷸'
         };
 
+        // ==================== 易經原文處理 ====================
+        // 從外部yijing-text.js文件獲取易經原文
+        function getYijingText(guaName) {
+            // 檢查外部文件是否成功載入
+            if (typeof YIJING_TEXT === 'undefined') {
+                return `${guaName}
+
+錯誤：易經文本數據庫未能正確載入。
+請確認 yijing-text.js 文件與此HTML文件在同一目錄下。`;
+            }
+            
+            // 從數據庫中獲取對應的卦辭
+            if (YIJING_TEXT[guaName]) {
+                return YIJING_TEXT[guaName];
+            } else {
+                return `${guaName}
+
+此卦的詳細原文尚未添加到數據庫中。
+請在 yijing-text.js 文件中補充此卦的內容。`;
+            }
+        }
+
         // 爻的名稱映射
         const yaoNames = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
 
@@ -929,34 +982,13 @@ img {
         // 畫面3 → 畫面4
         document.getElementById('toSurveyButton').addEventListener('click', function() {
             surveyQuestionDisplay.textContent = `問題：${gameState.question}`;
+            
+            // 顯示易經原文
+            const guaInfo = calculateGua(gameState.results);
+            const yijingTextDisplay = document.getElementById('yijingTextDisplay');
+            yijingTextDisplay.textContent = getYijingText(guaInfo.guaName);
+            
             showScreen(4);
-        });
-
-        // 畫面4 問卷選項
-        document.getElementById('showSimpleSurvey').addEventListener('click', function() {
-            resultSurveyContainer.style.display = 'block';
-            // 這裡可以動態載入簡易問卷
-            resultSurveyContainer.innerHTML = `
-                <div style="padding: 40px; text-align: center; color: #888;">
-                    <p style="font-size: 1.2em; margin-bottom: 15px;">📝 簡易問卷將顯示於此</p>
-                    <p>請在代碼中插入您的 Google 簡易問卷嵌入代碼</p>
-                </div>
-            `;
-        });
-
-        document.getElementById('showDetailedSurvey').addEventListener('click', function() {
-            resultSurveyContainer.style.display = 'block';
-            // 這裡可以動態載入詳盡問卷
-            resultSurveyContainer.innerHTML = `
-                <div style="padding: 40px; text-align: center; color: #888;">
-                    <p style="font-size: 1.2em; margin-bottom: 15px;">📝 詳盡問卷將顯示於此</p>
-                    <p>請在代碼中插入您的 Google 詳盡問卷嵌入代碼</p>
-                </div>
-            `;
-        });
-
-        document.getElementById('skipToFeedback').addEventListener('click', function() {
-            showScreen(5);
         });
 
         // 畫面4 → 畫面3
@@ -1208,6 +1240,9 @@ img {
                 const yaoValue = gameState.totalSticks / 4;
                 gameState.results.push(yaoValue);
                 
+                // 更新即時顯示
+                updateLiveResults();
+                
                 status.textContent = `${yaoNames[gameState.currentYao]}完成！得到數字：${yaoValue}`;
                 instruction.textContent = gameState.currentYao < 5 ? '點擊「繼續」進行下一爻' : '占卜完成！';
                 
@@ -1332,6 +1367,36 @@ img {
             showScreen(3);
         }
 
+        // 更新即時結果顯示
+        function updateLiveResults() {
+            const liveResults = document.getElementById('liveResults');
+            const liveResultsGrid = document.getElementById('liveResultsGrid');
+            
+            if (gameState.results.length === 0) {
+                liveResults.style.display = 'none';
+                return;
+            }
+            
+            liveResults.style.display = 'block';
+            liveResultsGrid.innerHTML = '';
+            
+            gameState.results.forEach((num, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+                
+                if (isChangingYao(num)) {
+                    itemDiv.style.borderColor = '#ff9500';
+                    itemDiv.style.background = 'rgba(255, 149, 0, 0.15)';
+                }
+                
+                itemDiv.innerHTML = `
+                    <div class="result-label">${yaoNames[index]}${isChangingYao(num) ? ' ⚡' : ''}</div>
+                    <div class="result-number">${num}</div>
+                `;
+                liveResultsGrid.appendChild(itemDiv);
+            });
+        }
+
         function resetAll() {
             gameState = {
                 question: '',
@@ -1347,6 +1412,9 @@ img {
             questionInput.value = '';
             resultsGrid.innerHTML = '';
             document.getElementById('continueButton').style.display = 'none';
+            
+            // 隱藏即時結果
+            document.getElementById('liveResults').style.display = 'none';
             
             // 隱藏查看結果按鈕
             const viewResultButton = document.getElementById('viewResultButton');
