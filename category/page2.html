@@ -723,6 +723,30 @@
                 <!-- 易經原文顯示區 -->
                 <div class="survey-intro" style="margin-bottom: 30px;">
                     <h2 style="color: #f0a500; margin-bottom: 20px;">易經解讀</h2>
+                    
+                    <!-- 卦象顯示區域 -->
+                    <div style="display: flex; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center;">
+                        <!-- 本卦 -->
+                        <div style="flex: 1; min-width: 250px; max-width: 400px;">
+                            <h3 style="color: #f0a500; text-align: center; margin-bottom: 15px;">本卦</h3>
+                            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 20px; border: 1px solid rgba(240, 165, 0, 0.3);">
+                                <div id="benguaCanvas" style="display: flex; justify-content: center; margin-bottom: 15px;"></div>
+                                <div id="benguaName" style="text-align: center; font-size: 1.3em; color: #f0a500; font-weight: bold;"></div>
+                                <div id="benguaChanging" style="text-align: center; font-size: 1em; color: #ff9500; margin-top: 10px;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 變卦(如果有變爻) -->
+                        <div id="bianGuaContainer" style="flex: 1; min-width: 250px; max-width: 400px; display: none;">
+                            <h3 style="color: #f0a500; text-align: center; margin-bottom: 15px;">變卦</h3>
+                            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 20px; border: 1px solid rgba(255, 149, 0, 0.3);">
+                                <div id="bianguaCanvas" style="display: flex; justify-content: center; margin-bottom: 15px;"></div>
+                                <div id="bianguaName" style="text-align: center; font-size: 1.3em; color: #ff9500; font-weight: bold;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 原文 -->
                     <div id="yijingTextDisplay" style="
                         background: rgba(0, 0, 0, 0.3);
                         padding: 25px;
@@ -862,21 +886,52 @@
         function getYijingText(guaName) {
             // 檢查外部文件是否成功載入
             if (typeof YIJING_TEXT === 'undefined') {
-                return `${guaName}
-
-錯誤：易經文本數據庫未能正確載入。
-請確認 yijing-text.js 文件與此HTML文件在同一目錄下。`;
+                return {
+                    text: `${guaName}\n\n錯誤：易經文本數據庫未能正確載入。\n請確認 yijing-text.js 文件與此HTML文件在同一目錄下。`,
+                    image: null
+                };
             }
             
             // 從數據庫中獲取對應的卦辭
             if (YIJING_TEXT[guaName]) {
-                return YIJING_TEXT[guaName];
+                return {
+                    text: YIJING_TEXT[guaName].text || YIJING_TEXT[guaName],
+                    image: YIJING_TEXT[guaName].image || null
+                };
             } else {
-                return `${guaName}
-
-此卦的詳細原文尚未添加到數據庫中。
-請在 yijing-text.js 文件中補充此卦的內容。`;
+                return {
+                    text: `${guaName}\n\n此卦的詳細原文尚未添加到數據庫中。\n請在 yijing-text.js 文件中補充此卦的內容。`,
+                    image: null
+                };
             }
+        }
+
+        // 計算變卦
+        function calculateBianGua(binaryStr, changingYaoIndices) {
+            if (changingYaoIndices.length === 0) {
+                return null; // 無變爻,無變卦
+            }
+            
+            // 將本卦的二進制字符串轉換為陣列
+            let bianBinary = binaryStr.split('');
+            
+            // 變爻:0變1,1變0
+            changingYaoIndices.forEach(index => {
+                bianBinary[index] = bianBinary[index] === '1' ? '0' : '1';
+            });
+            
+            const bianBinaryStr = bianBinary.join('');
+            
+            // 查找變卦名稱
+            if (typeof GUA_BINARY !== 'undefined') {
+                for (const [guaName, binary] of Object.entries(GUA_BINARY)) {
+                    if (binary === bianBinaryStr) {
+                        return guaName;
+                    }
+                }
+            }
+            
+            return null;
         }
 
         // 爻的名稱映射
@@ -983,10 +1038,87 @@
         document.getElementById('toSurveyButton').addEventListener('click', function() {
             surveyQuestionDisplay.textContent = `問題：${gameState.question}`;
             
-            // 顯示易經原文
+            // 計算卦名和變爻
             const guaInfo = calculateGua(gameState.results);
+            const yijingData = getYijingText(guaInfo.guaName);
+            
+            // 顯示易經原文
             const yijingTextDisplay = document.getElementById('yijingTextDisplay');
-            yijingTextDisplay.textContent = getYijingText(guaInfo.guaName);
+            yijingTextDisplay.textContent = yijingData.text;
+            
+            // 顯示本卦
+            const benguaName = document.getElementById('benguaName');
+            const benguaChanging = document.getElementById('benguaChanging');
+            const benguaCanvas = document.getElementById('benguaCanvas');
+            
+            benguaName.textContent = guaInfo.guaName;
+            
+            // 顯示變爻信息
+            if (guaInfo.changingYaos.length > 0) {
+                benguaChanging.textContent = `變爻：${guaInfo.changingYaos.join('、')}`;
+            } else {
+                benguaChanging.textContent = '無變爻';
+            }
+            
+            // 顯示本卦圖片
+            benguaCanvas.innerHTML = '';
+            if (yijingData.image) {
+                const img = document.createElement('img');
+                img.src = yijingData.image;
+                img.alt = guaInfo.guaName;
+                img.style.maxWidth = '200px';
+                img.style.height = 'auto';
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    benguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">圖片載入失敗</div>';
+                };
+                benguaCanvas.appendChild(img);
+            } else {
+                benguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">暫無卦圖</div>';
+            }
+            
+            // 計算並顯示變卦
+            const bianGuaContainer = document.getElementById('bianGuaContainer');
+            if (guaInfo.changingYaos.length > 0 && typeof GUA_BINARY !== 'undefined') {
+                // 找出變爻的索引
+                const changingIndices = [];
+                gameState.results.forEach((num, index) => {
+                    if (isChangingYao(num)) {
+                        changingIndices.push(index);
+                    }
+                });
+                
+                const bianGuaName = calculateBianGua(guaInfo.binaryStr, changingIndices);
+                
+                if (bianGuaName) {
+                    const bianYijingData = getYijingText(bianGuaName);
+                    
+                    bianGuaContainer.style.display = 'block';
+                    document.getElementById('bianguaName').textContent = bianGuaName;
+                    
+                    const bianguaCanvas = document.getElementById('bianguaCanvas');
+                    bianguaCanvas.innerHTML = '';
+                    
+                    if (bianYijingData.image) {
+                        const img = document.createElement('img');
+                        img.src = bianYijingData.image;
+                        img.alt = bianGuaName;
+                        img.style.maxWidth = '200px';
+                        img.style.height = 'auto';
+                        img.onerror = function() {
+                            this.style.display = 'none';
+                            bianguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">圖片載入失敗</div>';
+                        };
+                        bianguaCanvas.appendChild(img);
+                    } else {
+                        bianguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">暫無卦圖</div>';
+                    }
+                } else {
+                    bianGuaContainer.style.display = 'none';
+                }
+            } else {
+                bianGuaContainer.style.display = 'none';
+            }
             
             showScreen(4);
         });
