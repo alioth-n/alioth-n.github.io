@@ -1,24 +1,1009 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VocabQuest — 克漏字練習系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a23;
+    --surface2: #1e2330;
+    --border: #2a3045;
+    --accent: #5b8df5;
+    --accent2: #e85d8a;
+    --gold: #f5c842;
+    --text: #e8ecf4;
+    --text-dim: #7a85a0;
+    --text-muted: #3d4560;
+    --green: #3ecf8e;
+    --red: #f55b5b;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -30vh;
+    left: -20vw;
+    width: 80vw;
+    height: 80vw;
+    background: radial-gradient(circle, rgba(91,141,245,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -20vh;
+    right: -10vw;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(232,93,138,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-<title>文章作品頁</title>
-<link rel="stylesheet" type="text/css" href="page1.css" />
+  /* ── LAYOUT ─────────────────────────── */
+  #app {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ── SCREENS ─────────────────────────── */
+  .screen { display: none; padding: 40px 0 60px; animation: fadeUp .35s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HEADER / LOGO ─────────────────────────── */
+  .logo-wrap {
+    text-align: center;
+    margin-bottom: 48px;
+    padding-top: 20px;
+  }
+  .logo-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #5b8df5 0%, #e85d8a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo-sub {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 6px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── CARDS ─────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+
+  /* ── SECTION TITLE ─────────────────────────── */
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  /* ── BUTTONS ─────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 28px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all .18s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #5b8df5, #7b6af5);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(91,141,245,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(91,141,245,0.4); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger {
+    background: transparent;
+    border: 1px solid var(--red);
+    color: var(--red);
+  }
+  .btn-danger:hover { background: var(--red); color: #fff; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  .btn-block { width: 100%; }
+
+  /* ── MODE CARD (Screen 1) ─────────────────────────── */
+  .mode-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .mode-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(91,141,245,0.06), rgba(232,93,138,0.06));
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .mode-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .mode-card:hover::before { opacity: 1; }
+  .mode-card.selected { border-color: var(--accent); }
+  .mode-icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, rgba(91,141,245,0.15), rgba(91,141,245,0.05));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0;
+  }
+  .mode-info h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; }
+  .mode-info p { color: var(--text-dim); font-size: 0.875rem; margin-top: 4px; }
+
+  /* ── SELECT ─────────────────────────── */
+  .custom-select {
+    width: 100%;
+    padding: 13px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a85a0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    cursor: pointer;
+    transition: border-color .18s;
+  }
+  .custom-select:focus { outline: none; border-color: var(--accent); }
+
+  /* ── QUIZ HEADER ─────────────────────────── */
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .quiz-progress-info { font-family: 'Syne', sans-serif; }
+  .quiz-progress-info .q-num { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+  .quiz-progress-info .q-total { color: var(--text-dim); font-size: 0.9rem; }
+  .timer-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    transition: color .3s;
+  }
+  .timer-badge.urgent { color: var(--red); border-color: var(--red); }
+  .timer-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── PROGRESS BAR ─────────────────────────── */
+  .progress-bar-wrap {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  /* ── SENTENCE ─────────────────────────── */
+  .sentence-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    position: relative;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 120px;
+    border-bottom: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+    text-align: center;
+    padding: 0 8px;
+    transition: all .2s;
+  }
+  .blank.answered { color: var(--text); border-color: var(--text-dim); }
+  .blank.correct  { color: var(--green); border-color: var(--green); }
+  .blank.wrong    { color: var(--red); border-color: var(--red); }
+
+  .fav-btn {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: none; border: none;
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: var(--text-muted);
+    transition: all .2s;
+    padding: 4px;
+    border-radius: 50%;
+  }
+  .fav-btn:hover { color: var(--accent2); transform: scale(1.2); }
+  .fav-btn.active { color: var(--accent2); }
+
+  /* ── OPTIONS ─────────────────────────── */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 500px) { .options-grid { grid-template-columns: 1fr; } }
+  .option-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all .18s;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .option-btn .opt-label {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all .18s;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(91,141,245,0.06); }
+  .option-btn:hover:not(:disabled) .opt-label { background: var(--accent); color: #fff; }
+  .option-btn.correct  { border-color: var(--green); background: rgba(62,207,142,0.08); }
+  .option-btn.correct .opt-label { background: var(--green); color: #fff; }
+  .option-btn.wrong    { border-color: var(--red);   background: rgba(245,91,91,0.08); }
+  .option-btn.wrong .opt-label { background: var(--red); color: #fff; }
+  .option-btn:disabled { cursor: default; }
+
+  /* ── NEXT BTN ─────────────────────────── */
+  .quiz-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* ── RESULT ─────────────────────────── */
+  .score-display {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .score-ring {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent) calc(var(--pct) * 1%), var(--surface2) 0);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+  .score-ring::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .score-num {
+    position: relative; z-index: 1;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--text);
+  }
+  .score-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .score-sub { color: var(--text-dim); font-size: 0.9rem; }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 24px 0;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; }
+  .stat-num.green { color: var(--green); }
+  .stat-num.red   { color: var(--red); }
+  .stat-num.gold  { color: var(--gold); }
+  .stat-label { color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
+
+  .review-tabs {
+    display: flex;
+    gap: 10px;
+    margin: 32px 0 20px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all .18s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── REVIEW ITEMS ─────────────────────────── */
+  .review-list { display: flex; flex-direction: column; gap: 16px; }
+  .review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .review-item.wrong-item  { border-left: 3px solid var(--red); }
+  .review-item.fav-item    { border-left: 3px solid var(--accent2); }
+  .review-item.correct-item { border-left: 3px solid var(--green); }
+  .review-sentence {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .review-word { font-weight: 600; color: var(--gold); }
+  .review-word.was-wrong { color: var(--red); }
+  .review-word.was-correct { color: var(--green); }
+  .review-answer-info {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .translations {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .translation-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  .translation-chip .chip-word { font-weight: 600; font-size: 0.9rem; }
+  .translation-chip.is-answer { border-color: var(--gold); }
+  .translation-chip.user-wrong { border-color: var(--red); }
+  .chip-translation { color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
+
+  .trans-loading {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  /* ── EMPTY STATE ─────────────────────────── */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-dim);
+  }
+  .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+  /* ── TOAST ─────────────────────────── */
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-size: 0.9rem;
+    color: var(--text);
+    z-index: 999;
+    transition: transform .3s ease;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+  .back-link {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--text-dim); font-size: 0.9rem;
+    cursor: pointer; width: fit-content;
+    margin-bottom: 24px;
+    transition: color .18s;
+  }
+  .back-link:hover { color: var(--text); }
+
+  .file-hint {
+    background: rgba(91,141,245,0.07);
+    border: 1px solid rgba(91,141,245,0.2);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-top: 16px;
+  }
+  .file-hint code {
+    font-family: monospace;
+    background: rgba(255,255,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+</style>
 </head>
 <body>
+<div id="app">
+  <!-- ========== SCREEN 1: 選擇模式 ========== -->
+  <div class="screen active" id="screen-1">
+    <div class="logo-wrap">
+      <div class="logo-title">VocabQuest</div>
+      <div class="logo-sub">互動式英語單字練習系統</div>
+    </div>
+    <div class="section-label">選擇模式</div>
+    <div class="mode-card selected" id="mode-cloze" onclick="selectMode('cloze')">
+      <div class="mode-icon">📝</div>
+      <div class="mode-info">
+        <h3>克漏字測驗</h3>
+        <p>從例句中找出正確單字，測試你的詞彙量</p>
+      </div>
+    </div>
+    <div style="margin-top: 32px;">
+      <button class="btn btn-primary btn-block" onclick="goTo(2)" style="padding:16px;">開始 →</button>
+    </div>
+  </div>
 
-<ul class="ul1">
-      <li><a href="../index.html">首頁-介紹頁</a></li>
-      <li><a class="active" href="">文章作品頁</a></li>
-      <li><a href="page2.html">電腦作品頁</a></li>
-      <li><a href="page3.html">流浪地球</a></li>
-</ul>
-<hr>
-  <h2>近期文章作品</h2>
-<hr>
-  <h2>聯絡資訊</h2>
-<hr>
-  <h2>留言表單</h2>
+  <!-- ========== SCREEN 2: 選擇字典 ========== -->
+  <div class="screen" id="screen-2">
+    <div class="back-link" onclick="goTo(1)">← 返回</div>
+    <div class="logo-wrap" style="margin-bottom:32px;">
+      <div class="logo-title" style="font-size:1.8rem;">選擇字典</div>
+    </div>
+    <div class="card">
+      <div class="section-label">字典來源</div>
+      <select class="custom-select" id="dict-select">
+        <option value="all">📚 總複習（全部字典）</option>
+      </select>
+      <div class="file-hint">
+        💡 <strong>如何新增字典？</strong><br>
+        只需兩步驟，完全不用碰 <code>index.html</code>：<br><br>
+        ① 新建字典檔，例如 <code>vocab_unit1.js</code>，格式：<br>
+        <code>const vocab_unit1 = [<br>
+        &nbsp;&nbsp;{ word: "example", sentence: "This is an example sentence." },<br>
+        ];</code><br><br>
+        ② 在 <code>manifest.js</code> 加入一行：<br>
+        <code>{ file: "vocab_unit1", name: "第一單元" },</code>
+      </div>
+    </div>
+    <div style="margin-top: 24px;">
+      <button class="btn btn-primary btn-block" onclick="startQuiz()" style="padding:16px;">開始考試 🚀</button>
+    </div>
+  </div>
 
+  <!-- ========== SCREEN 3: 考試 ========== -->
+  <div class="screen" id="screen-3">
+    <div class="quiz-header">
+      <div class="quiz-progress-info">
+        <span class="q-num" id="q-current">1</span>
+        <span class="q-total"> / <span id="q-total">40</span></span>
+      </div>
+      <div class="timer-badge" id="timer-badge">
+        <span class="timer-dot"></span>
+        <span id="timer-display">00:00</span>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="sentence-card" id="sentence-card">
+      <button class="fav-btn" id="fav-btn" onclick="toggleFav()" title="加入收藏">♡</button>
+      <div id="sentence-display"></div>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="quiz-actions">
+      <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>
+        下一題 →
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 4: 結果 ========== -->
+  <div class="screen" id="screen-4">
+    <div class="score-display">
+      <div class="score-ring" id="score-ring" style="--pct:0">
+        <div class="score-num" id="score-pct-display">0%</div>
+      </div>
+      <div class="score-label" id="score-label-text">完成！</div>
+      <div class="score-sub" id="score-sub-text"></div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-num green" id="stat-correct">0</div>
+          <div class="stat-label">答對</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num red" id="stat-wrong">0</div>
+          <div class="stat-label">答錯</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num gold" id="stat-fav">0</div>
+          <div class="stat-label">收藏</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="review-tabs">
+      <button class="tab-btn active" id="tab-wrong" onclick="setReviewTab('wrong')">❌ 錯題</button>
+      <button class="tab-btn" id="tab-fav-wrong" onclick="setReviewTab('fav-wrong')">❤️ 收藏 + 錯題</button>
+    </div>
+
+    <div id="review-container" class="review-list"></div>
+
+    <div class="divider"></div>
+    <button class="btn btn-outline btn-block" onclick="goHome()" style="padding:16px;">🏠 結束並回到首頁</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- manifest.js 定義 MANIFEST 陣列，是唯一需要維護的檔案 -->
+<script src="manifest.js"></script>
+
+<script>
+// ── 動態載入字典 ──────────────────────────────────────────
+// 根據 manifest.js 的 MANIFEST 陣列，依序用 <script> 標籤載入每個字典檔案
+// 全部載入完畢後才初始化 App
+
+let DICTIONARIES = [];
+
+function loadScriptSequentially(entries, index, callback) {
+  if (index >= entries.length) { callback(); return; }
+  const entry = entries[index];
+  const s = document.createElement('script');
+  s.src = entry.file + '.js';
+  s.onload = () => {
+    // 字典變數名稱與 file 名稱相同（e.g. vocab_sample）
+    const data = window[entry.file];
+    if (Array.isArray(data)) {
+      DICTIONARIES.push({ name: entry.name, data });
+    } else {
+      console.warn(`[VocabQuest] 找不到字典變數 "${entry.file}"，請確認 js 檔案內的變數名稱與 file 欄位一致。`);
+    }
+    loadScriptSequentially(entries, index + 1, callback);
+  };
+  s.onerror = () => {
+    console.warn(`[VocabQuest] 無法載入 "${entry.file}.js"，已跳過。`);
+    loadScriptSequentially(entries, index + 1, callback);
+  };
+  document.head.appendChild(s);
+}
+
+// 等 manifest.js 執行完後開始載入
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof MANIFEST === 'undefined' || !MANIFEST.length) {
+    console.error('[VocabQuest] manifest.js 未定義 MANIFEST 或為空！');
+    initApp();
+    return;
+  }
+  loadScriptSequentially(MANIFEST, 0, initApp);
+});
+
+function initApp() {
+  initDictSelect();
+}
+</script>
+
+<script>
+// ── 狀態 ─────────────────────────────────────────────────
+let currentScreen = 1;
+let quizQuestions  = [];   // { item, options, correctIndex }
+let quizIndex      = 0;
+let answers        = [];   // { correct: bool, selectedWord, correctWord, item }
+let favorites      = new Set();
+let timerInterval  = null;
+let timerSeconds   = 0;
+const LABELS = ['A','B','C','D'];
+
+// ── 初始化下拉選單 ─────────────────────────────────────────
+function initDictSelect() {
+  const sel = document.getElementById('dict-select');
+  sel.innerHTML = '<option value="all">📚 總複習（全部字典）</option>';
+  DICTIONARIES.forEach((d, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = '📖 ' + d.name;
+    sel.appendChild(opt);
+  });
+}
+
+// ── 切換 Screen ─────────────────────────────────────────
+function goTo(n) {
+  document.getElementById('screen-' + currentScreen).classList.remove('active');
+  document.getElementById('screen-' + n).classList.add('active');
+  currentScreen = n;
+  window.scrollTo(0,0);
+}
+
+function goHome() {
+  stopTimer();
+  quizQuestions = []; quizIndex = 0; answers = []; favorites = new Set();
+  goTo(1);
+}
+
+function selectMode(m) { /* 目前只有 cloze，留著擴充 */ }
+
+// ── 建立考題 ─────────────────────────────────────────────
+function buildPool() {
+  const val = document.getElementById('dict-select').value;
+  let pool = [];
+  if (val === 'all') {
+    DICTIONARIES.forEach(d => pool = pool.concat(d.data));
+  } else {
+    pool = [...DICTIONARIES[parseInt(val)].data];
+  }
+  // 去重（同 word 以第一筆為主）
+  const seen = new Set();
+  pool = pool.filter(item => {
+    const k = item.word.toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  return pool;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  const pool = buildPool();
+  if (pool.length < 2) { showToast('字典至少需要 2 個單字！'); return; }
+  const count  = Math.min(40, pool.length);
+  const picked = shuffle(pool).slice(0, count);
+  const allWords = pool.map(p => p.word);
+
+  quizQuestions = picked.map(item => {
+    const wrong = shuffle(allWords.filter(w => w !== item.word)).slice(0, 3);
+    const opts = shuffle([item.word, ...wrong]);
+    return { item, options: opts, correctIndex: opts.indexOf(item.word) };
+  });
+
+  quizIndex = 0;
+  answers   = [];
+  favorites = new Set();
+  timerSeconds = 0;
+
+  document.getElementById('q-total').textContent = quizQuestions.length;
+  goTo(3);
+  renderQuestion();
+  startTimer();
+}
+
+// ── 渲染題目 ─────────────────────────────────────────────
+function renderQuestion() {
+  const q = quizQuestions[quizIndex];
+  if (!q) return;
+
+  document.getElementById('q-current').textContent = quizIndex + 1;
+  document.getElementById('progress-fill').style.width = (quizIndex / quizQuestions.length * 100) + '%';
+
+  // 收藏
+  const favBtn = document.getElementById('fav-btn');
+  favBtn.textContent = favorites.has(quizIndex) ? '♥' : '♡';
+  favBtn.classList.toggle('active', favorites.has(quizIndex));
+
+  // 句子（挖空）
+  const sentence = q.item.sentence;
+  const re = new RegExp('\\b' + escapeRegex(q.item.word) + '\\b', 'i');
+  const withBlank = sentence.replace(re, `<span class="blank" id="blank-span">______</span>`);
+  document.getElementById('sentence-display').innerHTML = withBlank;
+
+  // 選項
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-label">${LABELS[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('next-btn').disabled = true;
+  document.getElementById('next-btn').textContent = (quizIndex === quizQuestions.length-1) ? '完成 ✓' : '下一題 →';
+}
+
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function toggleFav() {
+  if (favorites.has(quizIndex)) {
+    favorites.delete(quizIndex);
+    document.getElementById('fav-btn').textContent = '♡';
+    document.getElementById('fav-btn').classList.remove('active');
+    showToast('已取消收藏');
+  } else {
+    favorites.add(quizIndex);
+    document.getElementById('fav-btn').textContent = '♥';
+    document.getElementById('fav-btn').classList.add('active');
+    showToast('已加入收藏 ♥');
+  }
+}
+
+function selectAnswer(selectedIdx) {
+  const q = quizQuestions[quizIndex];
+  const isCorrect = selectedIdx === q.correctIndex;
+  const btns = document.querySelectorAll('#options-grid .option-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correctIndex) btn.classList.add('correct');
+    else if (i === selectedIdx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  const blank = document.getElementById('blank-span');
+  if (blank) {
+    blank.textContent = q.item.word;
+    blank.classList.add(isCorrect ? 'correct' : 'wrong');
+  }
+
+  answers.push({
+    correct: isCorrect,
+    selectedWord: q.options[selectedIdx],
+    correctWord: q.item.word,
+    item: q.item,
+    isFav: favorites.has(quizIndex)
+  });
+
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextQuestion() {
+  // 若未作答直接跳過（保留安全）
+  if (answers.length < quizIndex + 1) {
+    answers.push({ correct: false, selectedWord: null, correctWord: quizQuestions[quizIndex].item.word, item: quizQuestions[quizIndex].item, isFav: favorites.has(quizIndex) });
+  }
+  quizIndex++;
+  if (quizIndex >= quizQuestions.length) {
+    finishQuiz();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ── 計時器 ─────────────────────────────────────────────
+function startTimer() {
+  stopTimer();
+  timerSeconds = 0;
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    const m = String(Math.floor(timerSeconds/60)).padStart(2,'0');
+    const s = String(timerSeconds%60).padStart(2,'0');
+    document.getElementById('timer-display').textContent = `${m}:${s}`;
+  }, 1000);
+}
+function stopTimer() { if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
+
+// ── 完成考試 ─────────────────────────────────────────────
+function finishQuiz() {
+  stopTimer();
+  const total   = answers.length;
+  const correct = answers.filter(a=>a.correct).length;
+  const wrong   = total - correct;
+  const favCount = [...favorites].length;
+  const pct = Math.round(correct/total*100);
+
+  document.getElementById('score-ring').style.setProperty('--pct', pct);
+  document.getElementById('score-pct-display').textContent = pct + '%';
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent   = wrong;
+  document.getElementById('stat-fav').textContent     = favCount;
+
+  const labels = ['需要加油！','繼續努力！','表現不錯！','很棒！','優秀！🎉'];
+  const lvl = Math.min(4, Math.floor(pct/20));
+  document.getElementById('score-label-text').textContent = labels[lvl];
+  const m = String(Math.floor(timerSeconds/60)).padStart(2,'0');
+  const s = String(timerSeconds%60).padStart(2,'0');
+  document.getElementById('score-sub-text').textContent = `共 ${total} 題 ‧ 用時 ${m}:${s}`;
+
+  goTo(4);
+  setReviewTab('wrong');
+}
+
+// ── 複習頁籤 ─────────────────────────────────────────────
+let currentTab = 'wrong';
+function setReviewTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-wrong').classList.toggle('active', tab==='wrong');
+  document.getElementById('tab-fav-wrong').classList.toggle('active', tab==='fav-wrong');
+  renderReview();
+}
+
+function renderReview() {
+  const container = document.getElementById('review-container');
+  let items;
+  if (currentTab === 'wrong') {
+    items = answers.map((a,i)=>({...a,qi:i})).filter(a=>!a.correct);
+  } else {
+    // 錯題 + 收藏
+    items = answers.map((a,i)=>({...a,qi:i})).filter(a=>!a.correct || favorites.has(a.qi));
+  }
+
+  if (items.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">${currentTab==='wrong'?'🎉':'💔'}</div>${currentTab==='wrong'?'沒有錯題，全部答對！':'沒有收藏或錯題'}</div>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  items.forEach((a, idx) => {
+    const div = document.createElement('div');
+    const cls = !a.correct ? 'wrong-item' : (favorites.has(a.qi) ? 'fav-item' : 'correct-item');
+    div.className = 'review-item ' + cls;
+
+    const re = new RegExp('\\b' + escapeRegex(a.correctWord) + '\\b', 'i');
+    const highlighted = a.item.sentence.replace(re, `<span class="review-word ${a.correct?'was-correct':'was-wrong'}">${a.correctWord}</span>`);
+
+    let statusLine = '';
+    if (!a.correct) {
+      statusLine = `<div class="review-answer-info">你的答案：<span style="color:var(--red)">${a.selectedWord || '(未作答)'}</span> &nbsp;|&nbsp; 正確答案：<span style="color:var(--green)">${a.correctWord}</span></div>`;
+    } else {
+      statusLine = `<div class="review-answer-info" style="color:var(--green)">✓ 答對了</div>`;
+    }
+
+    const favTag = favorites.has(a.qi) ? ' <span style="color:var(--accent2);font-size:.85rem;">♥ 已收藏</span>' : '';
+
+    div.innerHTML = `
+      <div class="review-sentence">${highlighted}${favTag}</div>
+      ${statusLine}
+      <div id="trans-${idx}" class="trans-loading">翻譯載入中…</div>
+    `;
+    container.appendChild(div);
+
+    // 抓翻譯（非同步）
+    fetchTranslations(a, idx, div);
+  });
+}
+
+// ── 翻譯（MyMemory 免費 API）─────────────────────────────
+async function translateText(text, from='en', to='zh-TW') {
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
+    const r = await fetch(url);
+    const j = await r.json();
+    return j.responseData?.translatedText || null;
+  } catch(e) { return null; }
+}
+
+async function fetchTranslations(a, idx, parentDiv) {
+  const slot = document.getElementById('trans-' + idx);
+  if (!slot) return;
+
+  // 找出四個選項（根據 quizIndex 的 options）
+  // 由於 answers 沒有存選項，我們重新找原始題目
+  const qItem = quizQuestions.find(q => q.item.word === a.correctWord);
+  const opts = qItem ? qItem.options : [a.correctWord];
+
+  // 翻譯句子 + 四個選項
+  const [sentTrans, ...wordTrans] = await Promise.all([
+    translateText(a.item.sentence),
+    ...opts.map(w => translateText(w))
+  ]);
+
+  if (!slot.isConnected) return;
+
+  let html = '';
+  if (sentTrans) {
+    html += `<div style="font-size:.85rem;color:var(--text-dim);margin-bottom:8px;font-style:italic;">${sentTrans}</div>`;
+  }
+  html += `<div class="translations">`;
+  opts.forEach((opt, i) => {
+    const isAns  = opt === a.correctWord;
+    const isWrong = opt === a.selectedWord && !a.correct;
+    let chipCls = 'translation-chip';
+    if (isAns) chipCls += ' is-answer';
+    if (isWrong) chipCls += ' user-wrong';
+    html += `<div class="${chipCls}">
+      <div class="chip-word">${opt} ${isAns?'✓':''} ${isWrong?'✗':''}</div>
+      <div class="chip-translation">${wordTrans[i] || '—'}</div>
+    </div>`;
+  });
+  html += '</div>';
+  slot.className = '';
+  slot.innerHTML = html;
+}
+
+// ── Toast ─────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── 初始化由 initApp() 在字典全部載入完畢後觸發 ──────────
+</script>
 </body>
 </html>
