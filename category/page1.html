@@ -625,51 +625,20 @@
 
 <div id="toast"></div>
 
-<!-- manifest.js 定義 MANIFEST 陣列，是唯一需要維護的檔案 -->
+<!-- ═══════════════════════════════════════════════════════
+     manifest.js ← 唯一需要維護的檔案
+     把所有字典資料直接寫在裡面，新增字典只改這個檔案
+════════════════════════════════════════════════════════ -->
 <script src="manifest.js"></script>
 
 <script>
-// ── 動態載入字典 ──────────────────────────────────────────
-// 根據 manifest.js 的 MANIFEST 陣列，依序用 <script> 標籤載入每個字典檔案
-// 全部載入完畢後才初始化 App
-
-let DICTIONARIES = [];
-
-function loadScriptSequentially(entries, index, callback) {
-  if (index >= entries.length) { callback(); return; }
-  const entry = entries[index];
-  const s = document.createElement('script');
-  s.src = entry.file + '.js';
-  s.onload = () => {
-    // 字典變數名稱與 file 名稱相同（e.g. vocab_sample）
-    const data = window[entry.file];
-    if (Array.isArray(data)) {
-      DICTIONARIES.push({ name: entry.name, data });
-    } else {
-      console.warn(`[VocabQuest] 找不到字典變數 "${entry.file}"，請確認 js 檔案內的變數名稱與 file 欄位一致。`);
-    }
-    loadScriptSequentially(entries, index + 1, callback);
-  };
-  s.onerror = () => {
-    console.warn(`[VocabQuest] 無法載入 "${entry.file}.js"，已跳過。`);
-    loadScriptSequentially(entries, index + 1, callback);
-  };
-  document.head.appendChild(s);
-}
-
-// 等 manifest.js 執行完後開始載入
+// manifest.js 載入後 DICTIONARIES 已經就緒，直接初始化
 document.addEventListener('DOMContentLoaded', () => {
-  if (typeof MANIFEST === 'undefined' || !MANIFEST.length) {
-    console.error('[VocabQuest] manifest.js 未定義 MANIFEST 或為空！');
-    initApp();
-    return;
+  if (typeof DICTIONARIES === 'undefined' || !DICTIONARIES.length) {
+    console.error('[VocabQuest] manifest.js 未定義 DICTIONARIES 或為空！');
   }
-  loadScriptSequentially(MANIFEST, 0, initApp);
-});
-
-function initApp() {
   initDictSelect();
-}
+});
 </script>
 
 <script>
@@ -1003,7 +972,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ── 初始化由 initApp() 在字典全部載入完畢後觸發 ──────────
+// ── 初始化由上方 DOMContentLoaded 事件觸發 ───────────────
 </script>
 </body>
 </html>
