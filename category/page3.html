@@ -1,22 +1,808 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>個人履歷 — 玉衡 Alioth.n</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500&family=UnifrakturMaguntia&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink:        #1a1008;
+      --paper:      #f5f0e8;
+      --paper-dark: #e8e0cc;
+      --paper-mid:  #ede5d0;
+      --accent:     #8b1a1a;
+      --accent2:    #2c4a7c;
+      --rule:       #2a1f0e;
+      --muted:      #6b5d4f;
+      --gold:       #b8972a;
+    }
 
-<title>流浪地球</title>
-<link rel="stylesheet" type="text/css" href="page3.css" />
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Noto Serif TC', serif;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23f5f0e8'/%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23d4c9b0' opacity='0.4'/%3E%3C/svg%3E");
+    }
+
+    /* ── NAV ── */
+    .nav-bar {
+      list-style: none;
+      display: flex;
+      border-bottom: 2px solid var(--rule);
+      border-top: 3px double var(--rule);
+      background: var(--paper-dark);
+      padding: 0; margin: 0;
+    }
+    .nav-bar li a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: var(--muted);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-bar li a:hover:not(.active) { background: var(--paper-mid); color: var(--ink); }
+    .nav-bar li a.active { background: var(--accent); color: #fff; letter-spacing: 0.1em; }
+
+    /* ── MASTHEAD ── */
+    .masthead {
+      text-align: center;
+      padding: 28px 20px 16px;
+      border-bottom: 4px double var(--rule);
+    }
+    .masthead-eyebrow {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.45em;
+      color: var(--muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+    .masthead-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 1;
+      color: var(--ink);
+    }
+    .masthead-sub {
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.28em;
+      margin-top: 5px;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+
+    /* ── DATELINE ── */
+    .dateline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 20px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+    }
+
+    /* ── PAGE WRAP ── */
+    .page-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 24px 60px;
+    }
+
+    /* ═══════════════════════════════════════
+       PROFILE HERO — top nameplate section
+    ═══════════════════════════════════════ */
+    .profile-hero {
+      display: grid;
+      grid-template-columns: 200px 1px 1fr;
+      gap: 0 24px;
+      border-top: 3px double var(--rule);
+      border-bottom: 3px double var(--rule);
+      padding: 22px 0;
+      margin-bottom: 24px;
+    }
+    .profile-hero .vr { background: var(--rule); }
+
+    /* Left: photo placeholder + basic facts */
+    .profile-left { padding-right: 24px; }
+
+    .photo-frame {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border: 2px solid var(--rule);
+      background: var(--paper-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    /* If no image is uploaded, show a decorative placeholder */
+    .photo-frame::before {
+      content: '玉';
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 5rem;
+      color: var(--paper-mid);
+      position: absolute;
+    }
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+      display: block;
+    }
+    .photo-caption {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    /* Basic facts table */
+    .fact-table { width: 100%; border-collapse: collapse; }
+    .fact-table tr { border-bottom: 1px solid var(--paper-dark); }
+    .fact-table tr:last-child { border-bottom: none; }
+    .fact-table td {
+      font-size: 0.75rem;
+      padding: 5px 0;
+      line-height: 1.5;
+      vertical-align: top;
+    }
+    .fact-table td:first-child {
+      font-family: 'Noto Sans TC', sans-serif;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      padding-right: 10px;
+      width: 52px;
+    }
+    .fact-table td:last-child {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* Right: name + intro */
+    .profile-right { padding-left: 0; }
+
+    .section-label {
+      display: inline-block;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 2px 8px;
+      margin-bottom: 10px;
+    }
+
+    .profile-name {
+      font-family: 'Noto Serif TC', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+    .profile-name-en {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(1rem, 2vw, 1.5rem);
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .profile-tagline {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--accent);
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .profile-intro {
+      font-size: 0.86rem;
+      line-height: 2.0;
+      color: var(--ink);
+      text-align: justify;
+      letter-spacing: 0.03em;
+    }
+    .profile-intro p + p { margin-top: 0.6em; }
+
+    /* Drop cap */
+    .dropcap::first-letter {
+      float: left;
+      font-size: 3.2em;
+      line-height: 0.78;
+      font-weight: 900;
+      margin-right: 5px;
+      margin-top: 4px;
+      color: var(--accent);
+    }
+
+    /* ═══════════════════════════════════════
+       THREE-COLUMN BODY
+    ═══════════════════════════════════════ */
+    .body-grid {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr 1px 1fr;
+      gap: 0 0;
+      margin-bottom: 24px;
+    }
+    .body-grid .vr { background: var(--rule); }
+
+    .body-col { padding: 0 22px; }
+    .body-col:first-child { padding-left: 0; }
+    .body-col:last-child  { padding-right: 0; }
+
+    .col-heading {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      border-bottom: 2px solid var(--rule);
+      padding-bottom: 5px;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    /* Timeline entries */
+    .timeline { list-style: none; padding: 0; }
+    .timeline-item {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 16px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    /* vertical connecting line */
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 14px;
+      bottom: -14px;
+      width: 1px;
+      background: var(--paper-dark);
+    }
+    .timeline-year {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .timeline-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+    .timeline-body {
+      font-size: 0.76rem;
+      line-height: 1.8;
+      color: #3d3028;
+    }
+
+    /* Skill bars */
+    .skill-item { margin-bottom: 13px; }
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    .skill-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .skill-level {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .skill-bar {
+      height: 4px;
+      background: var(--paper-dark);
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--accent);
+      transition: width 1s ease;
+    }
+
+    /* Awards / certs */
+    .award-item {
+      border-left: 2px solid var(--paper-dark);
+      padding-left: 10px;
+      margin-bottom: 14px;
+    }
+    .award-item.highlight { border-left-color: var(--gold); }
+    .award-year {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .award-title {
+      font-size: 0.83rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 2px 0;
+    }
+    .award-body {
+      font-size: 0.73rem;
+      line-height: 1.7;
+      color: #3d3028;
+    }
+
+    /* ═══════════════════════════════════════
+       BOTTOM FULL-WIDTH STRIP
+    ═══════════════════════════════════════ */
+    .bottom-strip {
+      border-top: 3px solid var(--rule);
+      padding-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr 1px 1fr;
+      gap: 0;
+      margin-bottom: 24px;
+    }
+    .bottom-strip .vr { background: var(--rule); }
+    .strip-col { padding: 0 22px; }
+    .strip-col:first-child { padding-left: 0; }
+    .strip-col:last-child  { padding-right: 0; }
+
+    .strip-col h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--paper-dark);
+    }
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .tag-chip {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+      padding: 2px 8px;
+      letter-spacing: 0.04em;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .tag-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+    .contact-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .contact-row a {
+      font-size: 0.76rem;
+      color: var(--accent2);
+      text-decoration: none;
+      font-family: 'Noto Sans TC', sans-serif;
+      letter-spacing: 0.04em;
+    }
+    .contact-row a:hover { text-decoration: underline; }
+
+    .lang-item { margin-bottom: 10px; }
+    .lang-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    .lang-level {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    .lang-dots { display: flex; gap: 4px; margin-top: 4px; }
+    .lang-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent);
+    }
+    .lang-dot.filled { background: var(--accent); }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-family: 'Noto Sans TC', sans-serif;
+      letter-spacing: 0.2em;
+      border-top: 3px double var(--rule);
+      padding-top: 10px;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .profile-hero { animation: fadeUp 0.5s 0.05s ease both; }
+    .body-grid    { animation: fadeUp 0.5s 0.15s ease both; }
+    .bottom-strip { animation: fadeUp 0.5s 0.25s ease both; }
+
+    /* Skill bar animation on load */
+    .skill-fill { width: 0 !important; }
+    .skill-fill.animated { width: var(--w) !important; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .profile-hero { grid-template-columns: 1fr; }
+      .profile-hero .vr { display: none; }
+      .profile-left { padding-right: 0; margin-bottom: 20px; }
+      .photo-frame { aspect-ratio: 1/1; max-width: 160px; }
+      .body-grid { grid-template-columns: 1fr; }
+      .body-grid .vr { display: none; }
+      .body-col { padding: 0 0 20px; border-bottom: 1px solid var(--paper-dark); }
+      .body-col:last-child { border-bottom: none; padding-bottom: 0; }
+      .bottom-strip { grid-template-columns: 1fr; }
+      .bottom-strip .vr { display: none; }
+      .strip-col { padding: 0 0 16px; border-bottom: 1px solid var(--paper-dark); }
+      .strip-col:last-child { border-bottom: none; }
+    }
+  </style>
 </head>
 <body>
 
-<ul class="ul1">
-      <li><a href="../index.html">首頁-介紹頁</a></li>
-      <li><a href="page1.html">文章作品頁</a></li>
-      <li><a href="page2.html">電腦作品頁</a></li>
-      <li><a class="active" href="">流浪地球</a></li>
+<!-- NAV -->
+<ul class="nav-bar">
+  <li><a href="../index.html">首頁-介紹頁</a></li>
+  <li><a href="page1.html">文章作品頁</a></li>
+  <li><a href="page2.html">電腦作品頁</a></li>
+  <li><a class="active" href="">流浪地球</a></li>
 </ul>
-<hr>
-      <h1>杜品鋒</h1>
-      <h2> 活人一個。</h2>
-      <h3>#杜品鋒 #Alioth #雨宮墨影</h3>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <p class="masthead-eyebrow">人物專版 · Curriculum Vitae · 個人履歷</p>
+  <div class="masthead-title">玉衡 Alioth.n</div>
+  <div class="masthead-sub">個 人 履 歷 頁</div>
+</div>
+
+<!-- DATELINE -->
+<div class="dateline">
+  <span>學歷 · 技能 · 作品 · 聯絡</span>
+  <span id="today-date"></span>
+  <span>履歷版</span>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ═══════════════════════════════════════
+       PROFILE HERO
+  ═══════════════════════════════════════ -->
+  <div class="profile-hero">
+
+    <!-- LEFT: photo + facts -->
+    <div class="profile-left">
+      <div class="photo-frame">
+        <!-- 替換成你的照片：把下面這行的 # 換成圖片路徑 -->
+        <!-- <img src="../image/your-photo.jpg" alt="玉衡 Alioth.n 個人照" /> -->
+      </div>
+      <p class="photo-caption">玉衡 · Alioth.n</p>
+
+      <table class="fact-table">
+        <tr>
+          <td>姓名</td>
+          <td>玉衡 Alioth.n</td>
+        </tr>
+        <tr>
+          <td>所在地</td>
+          <td>臺灣</td>  <!-- 修改成你的所在地 -->
+        </tr>
+        <tr>
+          <td>就學</td>
+          <td>高中就讀中</td>  <!-- 修改成你的學歷現況 -->
+        </tr>
+        <tr>
+          <td>興趣</td>
+          <td>玄學 · 理科 · 音樂</td>
+        </tr>
+        <tr>
+          <td>信箱</td>
+          <td><a href="mailto:pinfengdu@gmail.com" style="color:var(--accent2);font-size:0.7rem;">pinfengdu@gmail.com</a></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="vr"></div>
+
+    <!-- RIGHT: name + intro -->
+    <div class="profile-right">
+      <div class="section-label">人物特寫</div>
+      <h1 class="profile-name">玉　衡</h1>
+      <span class="profile-name-en">Alioth · Epsilon Ursae Majoris</span>
+
+      <p class="profile-tagline">
+        往前走，前方的路總會有人為你照亮。<br>
+        北斗第五星，以衡量萬物為名。
+      </p>
+
+      <div class="profile-intro dropcap">
+        <p>我是玉衡 Alioth.n，一個在理科和文科之間游走的人，對玄學、天文、程式設計、文字創作都有濃厚的興趣。這個部落格是我記錄思考的地方，也是我希望與人交流的空間。</p>
+        <p>北斗七星是我名字的來源。玉衡是北斗七星的第五星，古人用它衡量天體、定位方向。我想用同樣的方式面對自己的生活——不急著得到答案，而是保持精確的好奇心，持續觀察，持續前行。</p>
+        <p>目前正在尋找各種學術討論的可能，無論理科或文科都歡迎來信交流。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       THREE-COL BODY
+  ═══════════════════════════════════════ -->
+  <div class="body-grid">
+
+    <!-- COL 1: Education / Experience -->
+    <div class="body-col">
+      <h2 class="col-heading">學歷 · 經歷</h2>
+      <ul class="timeline">
+
+        <li class="timeline-item">
+          <div class="timeline-year">現在</div>
+          <div class="timeline-title">高中就讀中</div>  <!-- 修改成你的學校 -->
+          <div class="timeline-body">主修理科，同時對文史哲保有高度興趣。參與社團活動，持續寫作與程式學習。</div>
+        </li>
+
+        <li class="timeline-item">
+          <div class="timeline-year">2023</div>
+          <div class="timeline-title">部落格 玉衡 Alioth.n 創立</div>
+          <div class="timeline-body">開始以報紙美學為設計語言，記錄個人文章、電腦作品與生活思考。</div>
+        </li>
+
+        <li class="timeline-item">
+          <div class="timeline-year">2022</div>
+          <div class="timeline-title">開始自學網頁開發</div>
+          <div class="timeline-body">以 HTML、CSS、JavaScript 為起點，逐漸探索前端設計與視覺排版的可能性。</div>
+        </li>
+
+        <!-- 在這裡新增更多經歷，複製上面的 <li class="timeline-item"> 區塊 -->
+
+      </ul>
+    </div>
+
+    <div class="vr"></div>
+
+    <!-- COL 2: Skills -->
+    <div class="body-col">
+      <h2 class="col-heading">技能</h2>
+
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">HTML / CSS</span>
+          <span class="skill-level">熟練</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="--w: 85%"></div>
+        </div>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">JavaScript</span>
+          <span class="skill-level">進階中</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="--w: 60%"></div>
+        </div>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Python</span>
+          <span class="skill-level">基礎</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="--w: 45%"></div>
+        </div>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Git / GitHub</span>
+          <span class="skill-level">熟練</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="--w: 75%"></div>
+        </div>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">中文寫作</span>
+          <span class="skill-level">精通</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="--w: 92%"></div>
+        </div>
+      </div>
+
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">英文寫作</span>
+          <span class="skill-level">進階</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="--w: 70%"></div>
+        </div>
+      </div>
+
+      <!-- 新增技能：複製上面的 skill-item 區塊，調整 --w 百分比（0%–100%） -->
+
+    </div>
+
+    <div class="vr"></div>
+
+    <!-- COL 3: Awards / Projects -->
+    <div class="body-col">
+      <h2 class="col-heading">作品 · 獎項</h2>
+
+      <div class="award-item highlight">
+        <div class="award-year">2024</div>
+        <div class="award-title">玉衡部落格完整改版</div>
+        <div class="award-body">以報紙美學重新設計全站，包含文章頁、電腦作品星圖頁、履歷頁，並統一設計語言。</div>
+      </div>
+
+      <div class="award-item">
+        <div class="award-year">2024</div>
+        <div class="award-title">互動式電腦作品星圖</div>
+        <div class="award-body">以星空為主題設計的互動地圖，金色節點對應各個作品，支援 hover 預覽與點擊跳轉。</div>
+      </div>
+
+      <div class="award-item">
+        <div class="award-year">2023</div>
+        <div class="award-title">UDN 網路城邦部落格開設</div>
+        <div class="award-body">開始在 UDN 平台發表文章，主題涵蓋玄學、生活隨筆與科學感悟。</div>
+      </div>
+
+      <!-- 在這裡新增更多作品或獎項，複製上面的 award-item 區塊 -->
+      <!-- 加 class="highlight" 可以讓左邊框變成金色，代表重要項目 -->
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       BOTTOM STRIP
+  ═══════════════════════════════════════ -->
+  <div class="bottom-strip">
+
+    <!-- Interests / Keywords -->
+    <div class="strip-col">
+      <div class="section-label">關鍵詞</div>
+      <h3>興趣與關注領域</h3>
+      <div class="tag-cloud">
+        <span class="tag-chip">玄學</span>
+        <span class="tag-chip">紫微斗數</span>
+        <span class="tag-chip">天文</span>
+        <span class="tag-chip">數學之美</span>
+        <span class="tag-chip">物理</span>
+        <span class="tag-chip">TF 四代</span>
+        <span class="tag-chip">偶像文化</span>
+        <span class="tag-chip">文字創作</span>
+        <span class="tag-chip">閱讀</span>
+        <span class="tag-chip">網頁設計</span>
+        <span class="tag-chip">前端開發</span>
+        <span class="tag-chip">視覺排版</span>
+        <!-- 新增標籤：<span class="tag-chip">新標籤</span> -->
+      </div>
+    </div>
+
+    <div class="vr"></div>
+
+    <!-- Languages -->
+    <div class="strip-col">
+      <div class="section-label">語言</div>
+      <h3>語言能力</h3>
+
+      <div class="lang-item">
+        <div class="lang-name">繁體中文</div>
+        <div class="lang-level">母語</div>
+        <div class="lang-dots">
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+        </div>
+      </div>
+
+      <div class="lang-item">
+        <div class="lang-name">簡體中文</div>
+        <div class="lang-level">流利</div>
+        <div class="lang-dots">
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+        </div>
+      </div>
+
+      <div class="lang-item">
+        <div class="lang-name">English</div>
+        <div class="lang-level">進階 · Advanced</div>
+        <div class="lang-dots">
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot filled"></div>
+          <div class="lang-dot"></div>
+        </div>
+      </div>
+
+      <!-- 新增語言：複製上面的 lang-item 區塊，filled 的數量代表程度（最多 5 個） -->
+    </div>
+
+    <div class="vr"></div>
+
+    <!-- Contact -->
+    <div class="strip-col">
+      <div class="section-label">聯絡</div>
+      <h3>找到我</h3>
+      <div class="contact-row">
+        <a href="mailto:pinfengdu@gmail.com">✉ pinfengdu@gmail.com</a>
+        <a href="mailto:1789114730@qq.com">✉ 1789114730@qq.com</a>
+        <a href="https://www.instagram.com/alioth.n/" target="_blank">◎ Instagram · @alioth.n</a>
+        <a href="https://blog.udn.com/G_108543539071131983/article" target="_blank">◎ UDN 網路城邦部落格</a>
+      </div>
+    </div>
+
+  </div><!-- /bottom-strip -->
+
+  <div class="page-footer">✦ 玉衡 Alioth.n · 個人履歷 · 版權所有 ✦</div>
+
+</div><!-- /page-wrap -->
+
+<script>
+  // Date
+  document.getElementById('today-date').textContent =
+    new Date().toLocaleDateString('zh-TW', {
+      year:'numeric', month:'long', day:'numeric', timeZone:'Asia/Taipei'
+    });
+
+  // Animate skill bars when page loads
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.querySelectorAll('.skill-fill').forEach(el => {
+        el.classList.add('animated');
+      });
+    }, 300);
+  });
+</script>
 
 </body>
 </html>

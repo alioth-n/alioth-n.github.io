@@ -1,43 +1,607 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>玉衡Alioth.n</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
-  </head>
-  <body>
- 
-    <!-- <img src="image\logo.png"alt="北斗玉衡星徽" /> -->
-    <ul class="ul1">
-      <li><a class="active" href="">首頁-介紹頁</a></li>
-      <li><a href="category\page1.html">文章作品頁</a></li>
-      <li><a href="category\page5.html">電腦作品頁</a></li>
-      <li><a href="category\page3.html">流浪地球</a></li>
-    </ul>
-    <hr>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>玉衡 Alioth.n</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500&family=UnifrakturMaguntia&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════
+       CSS VARIABLES
+    ═══════════════════════════════════════════ */
+    :root {
+      --ink:        #1a1008;
+      --paper:      #f5f0e8;
+      --paper-dark: #e8e0cc;
+      --paper-mid:  #ede5d0;
+      --accent:     #8b1a1a;
+      --accent2:    #2c4a7c;
+      --rule:       #2a1f0e;
+      --muted:      #6b5d4f;
+      --gold:       #b8972a;
+    }
 
-    <div class="title">
-      <span width="60" height="60">玉衡Alioth.n</span>
-      <img src="image\logo.png" width="60" height="60" alt="北斗玉衡星徽" />
-      <img src="image\IMG_5680.PNG" width="90" height="60" alt="北斗七星旗" />
-    </div>    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <h2>往前走，前方的路總會有人為你照亮</h2>
-    <hr>
-    <h2>興趣</h2>
-    <h3>喜歡一些玄學</h3>
-    <h3>擔TF四代：杨博文、左奇函、陈思罕、陈浚铭、张桂源、张函瑞、王橹杰</h3>
-    <hr>
-    <h2>聯絡我</h2>
-    <h3>
-      以下是我的mail信箱，歡迎各類學術討論，無論理科或文科都歡迎喔www
-      <ul>
-        <li>pinfengdu@gmail.com</li>
-        <li>1789114730@qq.com</li>
-      </ul>
-    </h3>
-    <ul class="linktree">
-      <li><a href="https://www.instagram.com/alioth.n/" target="_blank">Instagram</a></li>
-      <li><a href="https://blog.udn.com/G_108543539071131983/article" target="_blank">udn blog網路城邦</a></li>
-    </ul>
-  </body>
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Noto Serif TC', serif;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23f5f0e8'/%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23d4c9b0' opacity='0.4'/%3E%3C/svg%3E");
+    }
+
+    /* ═══════════════════════════════════════════
+       ★ NAVIGATION BAR
+       Copy everything inside this block to unify
+       styles across all pages.
+    ═══════════════════════════════════════════ */
+    .nav-bar {
+      list-style: none;
+      display: flex;
+      border-bottom: 2px solid var(--rule);
+      border-top: 3px double var(--rule);
+      background: var(--paper-dark);
+      padding: 0;
+      margin: 0;
+    }
+    .nav-bar li a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: var(--muted);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-bar li a:hover:not(.active) {
+      background: var(--paper-mid);
+      color: var(--ink);
+    }
+    .nav-bar li a.active {
+      background: var(--accent);
+      color: #fff;
+      letter-spacing: 0.1em;
+    }
+    /* ═══════════════════════════════════════════
+       END NAVIGATION BLOCK
+    ═══════════════════════════════════════════ */
+
+    /* ── PAGE WRAPPER ── */
+    .page-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    /* ── GRAND MASTHEAD ── */
+    .masthead {
+      text-align: center;
+      padding: 40px 20px 20px;
+      position: relative;
+    }
+    .masthead::after {
+      content: '';
+      display: block;
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--rule) 0px,
+        var(--rule) 6px,
+        transparent 6px,
+        transparent 10px
+      );
+      margin-top: 20px;
+    }
+    .masthead-eyebrow {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.45em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .masthead-name {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(3.5rem, 10vw, 6.5rem);
+      line-height: 0.95;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+      position: relative;
+      display: inline-block;
+    }
+    /* decorative star flanking the title */
+    .masthead-name::before,
+    .masthead-name::after {
+      content: '✦';
+      font-size: 1.2rem;
+      color: var(--accent);
+      vertical-align: middle;
+      margin: 0 16px;
+      opacity: 0.7;
+    }
+    .masthead-chinese {
+      font-family: 'Noto Serif TC', serif;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 700;
+      letter-spacing: 0.5em;
+      color: var(--accent);
+      margin-top: 6px;
+      display: block;
+    }
+    .masthead-motto {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── DATELINE STRIP ── */
+    .dateline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      margin: 0 0 28px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .dateline-center {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 2px 14px;
+      letter-spacing: 0.2em;
+      font-size: 0.65rem;
+    }
+
+    /* ── INTRO SECTION ── */
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0 28px;
+      border-top: 3px double var(--rule);
+      padding-top: 20px;
+      margin-bottom: 28px;
+    }
+    .intro-grid .vr { background: var(--rule); }
+
+    .intro-left { }
+    .intro-right { }
+
+    .section-label {
+      display: inline-block;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 2px 8px;
+      margin-bottom: 10px;
+    }
+
+    .intro-headline {
+      font-size: 1.6rem;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+    .intro-body {
+      font-size: 0.86rem;
+      line-height: 2.0;
+      color: var(--ink);
+      text-align: justify;
+    }
+    .intro-body p + p { margin-top: 0.5em; }
+
+    /* drop cap */
+    .dropcap::first-letter {
+      float: left;
+      font-size: 3.2em;
+      line-height: 0.78;
+      font-weight: 900;
+      margin-right: 5px;
+      margin-top: 4px;
+      color: var(--accent);
+    }
+
+    /* ── INTEREST BLOCK ── */
+    .interest-block {
+      border-top: 1px solid var(--rule);
+      padding-top: 14px;
+    }
+    .interest-block h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--paper-dark);
+    }
+    .interest-block p {
+      font-size: 0.84rem;
+      line-height: 1.9;
+      color: #3d3028;
+    }
+    .idol-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .idol-chip {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.72rem;
+      border: 1px solid var(--muted);
+      padding: 3px 10px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── PULL QUOTE ── */
+    .pull-quote {
+      border-top: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      padding: 12px 0;
+      margin: 16px 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-style: italic;
+      color: var(--accent);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* ── LINKS / NAVIGATION CARDS ── */
+    .nav-section {
+      border-top: 3px solid var(--rule);
+      padding-top: 18px;
+      margin-bottom: 28px;
+    }
+    .nav-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .nav-section-header h2 {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .nav-section-header .rule-line {
+      flex: 1;
+      height: 1px;
+      background: var(--muted);
+      opacity: 0.4;
+    }
+
+    .page-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+    .page-card {
+      padding: 16px 20px 16px 0;
+      border-right: 1px solid var(--rule);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: background 0.15s;
+    }
+    .page-card:last-child { border-right: none; padding-right: 0; }
+    .page-card:first-child { padding-left: 0; }
+    .page-card:not(:first-child) { padding-left: 20px; }
+    .page-card:hover { background: var(--paper-mid); }
+
+    .card-num {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 2.2rem;
+      color: var(--paper-dark);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: 0.77rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+    .card-arrow {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.7rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--accent);
+    }
+
+    /* ── CONTACT SECTION ── */
+    .contact-section {
+      border-top: 3px double var(--rule);
+      padding-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0 28px;
+    }
+    .contact-section .vr { background: var(--rule); }
+
+    .contact-col h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--paper-dark);
+    }
+    .contact-list {
+      list-style: none;
+      padding: 0;
+    }
+    .contact-list li {
+      font-size: 0.82rem;
+      line-height: 2.1;
+      padding-left: 1em;
+      position: relative;
+      color: #3d3028;
+    }
+    .contact-list li::before {
+      content: '◆';
+      position: absolute;
+      left: 0;
+      font-size: 0.45rem;
+      top: 0.55em;
+      color: var(--accent);
+    }
+    .contact-list a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+    .contact-list a:hover { text-decoration: underline; }
+
+    .social-col { padding-left: 28px; }
+    .social-links {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .social-links li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.82rem;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 8px 12px;
+      border: 1px solid var(--paper-dark);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .social-links li a:hover {
+      border-color: var(--accent);
+      background: var(--paper-mid);
+    }
+    .social-links li a .link-label {
+      flex: 1;
+      letter-spacing: 0.05em;
+    }
+    .social-links li a .link-arrow {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-family: 'Noto Sans TC', sans-serif;
+      letter-spacing: 0.2em;
+      border-top: 3px double var(--rule);
+      padding-top: 10px;
+      margin-top: 28px;
+    }
+
+    /* ── FADE-IN ANIMATION ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .masthead        { animation: fadeUp 0.6s ease both; }
+    .dateline        { animation: fadeUp 0.6s 0.1s ease both; }
+    .intro-grid      { animation: fadeUp 0.6s 0.2s ease both; }
+    .nav-section     { animation: fadeUp 0.6s 0.3s ease both; }
+    .contact-section { animation: fadeUp 0.6s 0.4s ease both; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .intro-grid      { grid-template-columns: 1fr; }
+      .intro-grid .vr  { display: none; }
+      .page-cards      { grid-template-columns: 1fr; }
+      .page-card       { border-right: none; border-bottom: 1px solid var(--rule); padding: 14px 0 !important; }
+      .page-card:last-child { border-bottom: none; }
+      .contact-section { grid-template-columns: 1fr; }
+      .contact-section .vr { display: none; }
+      .social-col      { padding-left: 0; padding-top: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ★ NAVIGATION BAR -->
+  <ul class="nav-bar">
+    <li><a class="active" href="">首頁-介紹頁</a></li>
+    <li><a href="category/page1.html">文章作品頁</a></li>
+    <li><a href="category/page2.html">電腦作品頁</a></li>
+    <li><a href="category/page3.html">流浪地球</a></li>
+  </ul>
+
+  <!-- ★ GRAND MASTHEAD -->
+  <div class="masthead">
+    <p class="masthead-eyebrow">北斗第五星 · Epsilon Ursae Majoris · 個人部落格</p>
+    <div class="masthead-name">Alioth.n</div>
+    <span class="masthead-chinese">玉　衡</span>
+    <p class="masthead-motto">往前走，前方的路總會有人為你照亮</p>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- ★ DATELINE -->
+    <div class="dateline">
+      <span>理科 · 文科 · 玄學 · 生活</span>
+      <span class="dateline-center">介 紹 頁</span>
+      <span id="today-date"></span>
+    </div>
+
+    <!-- ★ INTRO SECTION -->
+    <div class="intro-grid">
+
+      <!-- Left col: self intro -->
+      <div class="intro-left">
+        <div class="section-label">關於作者</div>
+        <h2 class="intro-headline">北斗第五星，<br>照亮每一個仰望者</h2>
+        <div class="intro-body dropcap">
+          <p>玉衡，北斗七星之第五星，學名 Epsilon Ursae Majoris，西名 Alioth。古人以北斗定方向，以玉衡量天體，這顆星的名字裡藏著「衡量」與「平衡」的意涵。</p>
+          <p>這個部落格以玉衡為名，寫的是一個普通人試圖在混沌中找到方向的過程——有時是理科的推導之美，有時是文科的文字溫度，有時是玄學的宇宙想像，有時只是生活裡一個不知道放哪裡的感想。</p>
+        </div>
+
+        <blockquote class="pull-quote">
+          「星不移步，但照亮了每一個仰望它的人。」
+        </blockquote>
+
+        <div class="intro-body">
+          <p>歡迎各類學術討論，無論理科或文科都歡迎。這裡的門永遠開著。</p>
+        </div>
+      </div>
+
+      <div class="vr"></div>
+
+      <!-- Right col: interests -->
+      <div class="intro-right">
+        <div class="section-label">興趣與關注</div>
+
+        <div class="interest-block">
+          <h3>喜歡一些玄學</h3>
+          <p>對命理、占星、紫微斗數抱有濃厚興趣。不盲目相信，也不輕易否定——更感興趣的是古人如何用這套語言系統來理解不確定性，以及它與現代思維的對話空間。</p>
+        </div>
+
+        <div class="interest-block" style="margin-top:16px;">
+          <h3>擔 TF 四代</h3>
+          <p>屬性待更新，不雷同擔</p>
+          <div class="idol-list">
+            <span class="idol-chip">杨博文</span>
+            <span class="idol-chip">左奇函</span>
+            <span class="idol-chip">陈思罕</span>
+            <span class="idol-chip">陈浚铭</span>
+            <span class="idol-chip">张桂源</span>
+            <span class="idol-chip">张函瑞</span>
+            <span class="idol-chip">王橹杰</span>
+          </div>
+        </div>
+
+        <div class="interest-block" style="margin-top:16px;">
+          <h3>理科與文科之間</h3>
+          <p>物理的優雅、數學的節奏、文字的溫度——這些東西在我這裡並不衝突。這個部落格是它們共存的地方。</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ★ PAGE NAVIGATION CARDS -->
+    <div class="nav-section">
+      <div class="nav-section-header">
+        <h2>前往各分區</h2>
+        <div class="rule-line"></div>
+      </div>
+      <div class="page-cards">
+
+        <a href="category/page1.html" class="page-card">
+          <div class="card-num">I</div>
+          <div class="card-title">文章作品頁</div>
+          <p class="card-desc">隨筆、玄學、科學感悟、音樂心得。以報紙版面呈現的文字集。</p>
+          <span class="card-arrow">前往 →</span>
+        </a>
+
+        <a href="category/page2.html" class="page-card">
+          <div class="card-num">II</div>
+          <div class="card-title">電腦作品頁</div>
+          <p class="card-desc">程式、設計、電腦相關的作品與學習紀錄。</p>
+          <span class="card-arrow">前往 →</span>
+        </a>
+
+        <a href="category/page3.html" class="page-card">
+          <div class="card-num">III</div>
+          <div class="card-title">流浪地球</div>
+          <p class="card-desc">關於這部作品的感想、分析與延伸思考。</p>
+          <span class="card-arrow">前往 →</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ★ CONTACT SECTION -->
+    <div class="contact-section">
+
+      <div class="contact-col">
+        <div class="section-label">聯絡方式</div>
+        <h3>歡迎來信討論</h3>
+        <p style="font-size:0.82rem; line-height:1.9; color:#3d3028; margin-bottom:10px;">
+          無論理科或文科，任何學術討論都歡迎。寫信是我最喜歡的交流方式。
+        </p>
+        <ul class="contact-list">
+          <li><a href="mailto:pinfengdu@gmail.com">pinfengdu@gmail.com</a></li>
+          <li><a href="mailto:1789114730@qq.com">1789114730@qq.com</a></li>
+        </ul>
+      </div>
+
+      <div class="vr"></div>
+
+      <div class="contact-col social-col">
+        <div class="section-label">外部連結</div>
+        <h3>找到我的其他地方</h3>
+        <ul class="social-links">
+          <li>
+            <a href="https://www.instagram.com/alioth.n/" target="_blank">
+              <span class="link-label">Instagram · @alioth.n</span>
+              <span class="link-arrow">↗</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://blog.udn.com/G_108543539071131983/article" target="_blank">
+              <span class="link-label">UDN 網路城邦部落格</span>
+              <span class="link-arrow">↗</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="page-footer">
+      ✦ 玉衡 Alioth.n · 個人部落格 · 版權所有 ✦
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <script>
+    const d = new Date();
+    const opts = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Taipei' };
+    document.getElementById('today-date').textContent = d.toLocaleDateString('zh-TW', opts);
+  </script>
+
+</body>
 </html>

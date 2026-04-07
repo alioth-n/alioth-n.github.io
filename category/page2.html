@@ -1,1568 +1,669 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易經大衍占卜</title>
-    
-    <!-- 引入易經文本數據庫 -->
-    <script src="yijing-text.js"></script>
-    
-    <style>
-        /* 導航列樣式 */
-        .ul1 {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            border: 1px solid #e7e7e7;
-            background-color: #f3f3f3;
-        }
-        
-        .ul1 li {
-            float: left;
-        }
-        
-        .ul1 li a {
-            display: block;
-            color: #666;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-        
-        .ul1 li a:hover:not(.active) {
-            background-color: #ddd;
-        }
-        
-        .ul1 li a.active {
-            color: white;
-            background-color: #4CAF50;
-        }
-        
-        img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        /* 主要樣式 */
-        /* Google AdSense 保留欄位 */
-        .adsense-placeholder {
-            display: none; /* 目前隱藏，申請後改為 block */
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(240, 165, 0, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            min-height: 100px;
-        }
-        
-        .adsense-placeholder-text {
-            color: #808080;
-            font-size: 0.9em;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin: 20px 0;
-            color: #f0a500;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        /* 畫面切換 */
-        .screen {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* 畫面1: 問題輸入 */
-        .question-screen {
-            max-width: 700px;
-            margin: 50px auto;
-        }
-
-        .question-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 40px;
-            border: 1px solid rgba(240, 165, 0, 0.3);
-        }
-
-        .question-title {
-            font-size: 1.8em;
-            color: #f0a500;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .question-subtitle {
-            font-size: 1.1em;
-            color: #b0b0b0;
-            margin-bottom: 25px;
-            text-align: center;
-            line-height: 1.6;
-        }
-
-        .question-input {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.2em;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(240, 165, 0, 0.5);
-            border-radius: 10px;
-            color: #e0e0e0;
-            outline: none;
-            transition: all 0.3s ease;
-            margin-bottom: 30px;
-        }
-
-        .question-input:focus {
-            border-color: #f0a500;
-            box-shadow: 0 0 15px rgba(240, 165, 0, 0.3);
-        }
-
-        .button {
-            display: block;
-            width: 100%;
-            padding: 18px;
-            font-size: 1.3em;
-            background: linear-gradient(135deg, #f0a500, #e09200);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(240, 165, 0, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(240, 165, 0, 0.6);
-        }
-
-        .button:active {
-            transform: translateY(0);
-        }
-
-        .button:disabled {
-            background: #555;
-            cursor: not-allowed;
-            box-shadow: none;
-            opacity: 0.5;
-        }
-
-        /* 畫面2: 占卜進行中 */
-        .divination-screen {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .question-display {
-            font-size: 1.5em;
-            color: #f0a500;
-            text-align: center;
-            padding: 20px;
-            background: rgba(240, 165, 0, 0.1);
-            border-radius: 10px;
-            border: 2px solid #f0a500;
-            margin-bottom: 20px;
-        }
-
-        .info-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(240, 165, 0, 0.3);
-        }
-
-        .status {
-            font-size: 1.2em;
-            text-align: center;
-            margin-bottom: 10px;
-            color: #f0a500;
-        }
-
-        .instruction {
-            text-align: center;
-            font-size: 1em;
-            color: #b0b0b0;
-        }
-
-        .error-message {
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-            border: 2px solid #ff6b6b;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-            font-size: 1.1em;
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .grid-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin: 30px auto;
-        }
-
-        .grid-row {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .grid-cell {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(240, 165, 0, 0.3);
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            position: relative;
-            min-height: 120px;
-            transition: all 0.3s ease;
-        }
-
-        .grid-cell.small {
-            width: 150px;
-        }
-
-        .grid-cell.large {
-            flex: 1;
-            max-width: 600px;
-        }
-
-        .grid-cell.active {
-            background: rgba(240, 165, 0, 0.1);
-            border-color: #f0a500;
-            box-shadow: 0 0 20px rgba(240, 165, 0, 0.3);
-        }
-
-        .grid-cell-label {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            font-size: 0.7em;
-            color: #808080;
-        }
-
-        .sticks-area {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        .stick {
-            width: 3px;
-            height: 30px;
-            background: linear-gradient(to bottom, #8B4513, #D2691E);
-            border-radius: 2px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .stick.horizontal {
-            width: 30px;
-            height: 3px;
-            transform: rotate(45deg);
-        }
-
-        .stick.moving {
-            animation: moveStick 0.8s ease;
-        }
-
-        @keyframes moveStick {
-            0% {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.3) translateY(-20px);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .stick-count {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #f0a500;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 2px 8px;
-            border-radius: 5px;
-        }
-
-        .dividing-interface {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .piles-display {
-            display: flex;
-            width: 100%;
-            justify-content: space-around;
-            align-items: flex-end;
-            min-height: 150px;
-        }
-
-        .pile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-        }
-
-        .pile-label {
-            font-size: 1em;
-            color: #f0a500;
-            margin-bottom: 10px;
-        }
-
-        .pile-sticks {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 2px;
-            justify-content: center;
-            overflow-x: auto;
-            max-width: 100%;
-        }
-
-        .slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #f0a500;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(240, 165, 0, 0.5);
-            transition: all 0.2s ease;
-        }
-
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(240, 165, 0, 0.7);
-        }
-
-        .slider::-moz-range-thumb {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #f0a500;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(240, 165, 0, 0.5);
-            border: none;
-            transition: all 0.2s ease;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        .button.secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
-            border: 2px solid rgba(240, 165, 0, 0.5);
-        }
-
-        .button.secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #f0a500;
-        }
-
-        /* 畫面3: 占卜結果 */
-        .result-screen {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .results-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(240, 165, 0, 0.3);
-            margin-bottom: 30px;
-        }
-
-        .results-title {
-            text-align: center;
-            font-size: 1.8em;
-            color: #f0a500;
-            margin-bottom: 25px;
-        }
-
-        .results-grid {
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 10px;
-            max-width: 400px;
-            margin: 0 auto 30px;
-        }
-
-        .result-item {
-            background: rgba(240, 165, 0, 0.1);
-            border: 2px solid #f0a500;
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .result-item:hover {
-            background: rgba(240, 165, 0, 0.15);
-            transform: translateX(5px);
-        }
-
-        .result-label {
-            font-size: 1.1em;
-            color: #e0e0e0;
-        }
-
-        .result-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #f0a500;
-        }
-
-        /* 畫面4&5: 問卷頁面 */
-        .survey-screen {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .survey-intro {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(240, 165, 0, 0.3);
-        }
-
-        .survey-intro h2 {
-            color: #f0a500;
-            font-size: 1.6em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .survey-intro p {
-            font-size: 1.1em;
-            line-height: 1.8;
-            color: #c0c0c0;
-            margin-bottom: 15px;
-        }
-
-        .survey-options {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 25px;
-        }
-
-        .survey-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(240, 165, 0, 0.3);
-            min-height: 600px;
-        }
-
-        .survey-container iframe {
-            width: 100%;
-            min-height: 800px;
-            border: none;
-            border-radius: 10px;
-        }
-
-        .navigation-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 25px;
-        }
-
-        /* 載入動畫 */
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(240, 165, 0, 0.2);
-            border-top: 4px solid #f0a500;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: #f0a500;
-            font-size: 1.2em;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>電腦作品頁 — 玉衡 Alioth.n</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500&family=UnifrakturMaguntia&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink:        #1a1008;
+      --paper:      #f5f0e8;
+      --paper-dark: #e8e0cc;
+      --paper-mid:  #ede5d0;
+      --accent:     #8b1a1a;
+      --accent2:    #2c4a7c;
+      --rule:       #2a1f0e;
+      --muted:      #6b5d4f;
+      --node-bg:    #1e1a14;
+      --node-paper: #f0ead8;
+      --star:       #d4b96a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Noto Serif TC', serif;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23f5f0e8'/%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23d4c9b0' opacity='0.4'/%3E%3C/svg%3E");
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    .nav-bar {
+      list-style: none;
+      display: flex;
+      border-bottom: 2px solid var(--rule);
+      border-top: 3px double var(--rule);
+      background: var(--paper-dark);
+      padding: 0; margin: 0;
+    }
+    .nav-bar li a {
+      display: block;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: var(--muted);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-bar li a:hover:not(.active) { background: var(--paper-mid); color: var(--ink); }
+    .nav-bar li a.active { background: var(--accent); color: #fff; letter-spacing: 0.1em; }
+
+    /* ── MASTHEAD ── */
+    .masthead {
+      text-align: center;
+      padding: 22px 20px 14px;
+      border-bottom: 4px double var(--rule);
+    }
+    .masthead-eyebrow {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.4em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .masthead-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1;
+      color: var(--ink);
+    }
+    .masthead-sub {
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.25em;
+      margin-top: 4px;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+
+    /* ── DATELINE ── */
+    .dateline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 20px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+    }
+
+    /* ══════════════════════════════════════
+       MAP CANVAS SECTION
+    ══════════════════════════════════════ */
+    .map-section {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 20px;
+    }
+
+    .map-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0 10px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 0;
+    }
+    .map-header h2 {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .map-header .rule-line { flex: 1; height: 1px; background: var(--muted); opacity: 0.35; }
+    .map-header .map-hint {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    /* The dark star-map canvas */
+    .map-canvas {
+      position: relative;
+      width: 100%;
+      height: 580px;
+      background: var(--node-bg);
+      border: 2px solid var(--rule);
+      border-top: none;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .map-canvas:active { cursor: grabbing; }
+
+    /* Subtle star-field background */
+    .map-canvas::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 40% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 75%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 80% 55%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 85%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 45%, rgba(255,255,255,0.15) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 90%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 48% 12%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 35%, rgba(255,255,255,0.2) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Vignette */
+    .map-canvas::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(10,8,4,0.6) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* The SVG layer for connection lines */
+    .map-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ── NODE ── */
+    .node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .node:hover { transform: translate(-50%, -50%) scale(1.12); z-index: 20; }
+
+    .node-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--star);
+      border: 2px solid rgba(255,255,255,0.3);
+      margin: 0 auto 6px;
+      box-shadow: 0 0 10px rgba(212,185,106,0.7), 0 0 24px rgba(212,185,106,0.3);
+      transition: box-shadow 0.2s, width 0.2s, height 0.2s;
+      position: relative;
+    }
+    /* Pulse ring */
+    .node-dot::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px solid rgba(212,185,106,0.3);
+      animation: pulse 2.5s ease-out infinite;
+    }
+    @keyframes pulse {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .node:hover .node-dot {
+      width: 18px;
+      height: 18px;
+      box-shadow: 0 0 16px rgba(212,185,106,0.9), 0 0 40px rgba(212,185,106,0.5);
+    }
+
+    /* hub node is bigger */
+    .node.hub .node-dot {
+      width: 22px;
+      height: 22px;
+      background: #e8c85a;
+      box-shadow: 0 0 18px rgba(232,200,90,0.9), 0 0 50px rgba(232,200,90,0.4);
+    }
+    .node.hub:hover .node-dot { width: 26px; height: 26px; }
+
+    .node-label {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      color: rgba(240,234,216,0.85);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      max-width: 100px;
+      line-height: 1.3;
+    }
+    .node.hub .node-label {
+      font-size: 0.75rem;
+      color: var(--star);
+      font-weight: 500;
+    }
+
+    /* ── TOOLTIP CARD ── */
+    .tooltip {
+      position: absolute;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .tooltip-inner {
+      background: var(--node-paper);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--accent);
+      padding: 12px 16px 14px;
+      width: 220px;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+      font-family: 'Noto Serif TC', serif;
+    }
+    .tooltip-tag {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      display: inline-block;
+      padding: 1px 6px;
+      margin-bottom: 6px;
+    }
+    .tooltip-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 5px;
+      color: var(--ink);
+    }
+    .tooltip-desc {
+      font-size: 0.75rem;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+    .tooltip-link {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent);
+      letter-spacing: 0.08em;
+    }
+    .tooltip-link:hover { color: var(--accent2); border-color: var(--accent2); }
+
+    /* ── MAP LEGEND ── */
+    .map-legend {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      z-index: 20;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.6rem;
+      color: rgba(240,234,216,0.5);
+      letter-spacing: 0.1em;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 7px; }
+    .legend-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--star);
+      box-shadow: 0 0 5px rgba(212,185,106,0.6);
+      flex-shrink: 0;
+    }
+    .legend-dot.hub-dot {
+      width: 11px; height: 11px;
+      background: #e8c85a;
+    }
+
+    /* ── COORDS DISPLAY ── */
+    .map-coords {
+      position: absolute;
+      bottom: 14px;
+      right: 16px;
+      z-index: 20;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.58rem;
+      color: rgba(240,234,216,0.3);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── INDEX TABLE below the map ── */
+    .index-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 50px;
+    }
+    .index-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0 10px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 14px;
+    }
+    .index-header h2 {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .index-header .rule-line { flex: 1; height: 1px; background: var(--muted); opacity: 0.35; }
+
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0;
+    }
+    .index-item {
+      padding: 10px 18px 12px 0;
+      border-right: 1px solid var(--rule);
+    }
+    .index-item:last-child { border-right: none; }
+    .index-cat {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      display: inline-block;
+      padding: 1px 5px;
+      margin-bottom: 5px;
+    }
+    .index-item h3 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .index-item p {
+      font-size: 0.75rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+    .index-item a {
+      display: inline-block;
+      margin-top: 5px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 0.65rem;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .page-footer {
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-family: 'Noto Sans TC', sans-serif;
+      letter-spacing: 0.2em;
+      border-top: 3px double var(--rule);
+      padding: 10px 20px;
+      margin: 0 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      .map-canvas { height: 420px; }
+      .index-grid { grid-template-columns: 1fr 1fr; }
+      .index-item { border-right: none; border-bottom: 1px solid var(--paper-dark); padding: 10px 0; }
+    }
+  </style>
 </head>
 <body>
-    <!-- 導航列 -->
-    <ul class="ul1">
-        <li><a href="../index.html">首頁-介紹頁</a></li>
-        <li><a href="page1.html">文章作品頁</a></li>
-        <li><a class="active" href="">電腦作品頁</a></li>
-        <li><a href="page3.html">流浪地球</a></li>
-    </ul>
 
-    <div class="container">
-        <h1>☯ 易經大衍占卜 ☯</h1>
+<!-- NAV -->
+<ul class="nav-bar">
+  <li><a href="../index.html">首頁-介紹頁</a></li>
+  <li><a href="page1.html">文章作品頁</a></li>
+  <li><a class="active" href="">電腦作品頁</a></li>
+  <li><a href="page3.html">流浪地球</a></li>
+</ul>
 
-        <!-- ==================== 畫面1: 問題輸入 ==================== -->
-        <div class="screen active" id="screen1">
-            <div class="question-screen">
-                <!-- Google AdSense 保留欄位 -->
-                <div class="adsense-placeholder">
-                    <div class="adsense-placeholder-text">Google AdSense 廣告位置</div>
-                    <!-- 申請AdSense後，將廣告代碼放在這裡 -->
-                </div>
+<!-- MASTHEAD -->
+<div class="masthead">
+  <p class="masthead-eyebrow">電腦作品 · 互動地圖 · Computer Works</p>
+  <div class="masthead-title">玉衡 Alioth.n</div>
+  <div class="masthead-sub">電 腦 作 品 星 圖</div>
+</div>
 
-                <div class="question-panel">
-                    <h2 class="question-title">誠心問卜</h2>
-                    <p class="question-subtitle">請靜心思考您的問題，以誠摯的心態進行占卜。<br>問題越具體明確，占卜結果越有參考價值。</p>
-                    <input type="text" class="question-input" id="questionInput" placeholder="例如：今年事業發展如何？我該如何改善與伴侶的關係？">
-                    <button class="button" id="startButton">開始占卜</button>
-                </div>
-            </div>
-        </div>
+<!-- DATELINE -->
+<div class="dateline">
+  <span>點擊節點查看詳情 · 可拖曳地圖</span>
+  <span id="today-date"></span>
+  <span>互動星圖版</span>
+</div>
 
-        <!-- ==================== 畫面2: 占卜進行中 ==================== -->
-        <div class="screen" id="screen2">
-            <div class="divination-screen">
-                <div class="question-display" id="questionDisplay"></div>
+<!-- MAP -->
+<div class="map-section">
+  <div class="map-header">
+    <h2>作品星圖</h2>
+    <div class="rule-line"></div>
+    <span class="map-hint">✦ 點擊節點開啟作品</span>
+  </div>
 
-                <div class="info-panel">
-                    <div class="status" id="status">準備中...</div>
-                    <div class="instruction" id="instruction">系統準備中</div>
-                </div>
+  <div class="map-canvas" id="mapCanvas">
 
-                <!-- 即時結果顯示 -->
-                <div class="results-panel" id="liveResults" style="display: none; margin-bottom: 20px;">
-                    <h3 style="text-align: center; color: #f0a500; font-size: 1.3em; margin-bottom: 15px;">目前結果</h3>
-                    <div class="results-grid" id="liveResultsGrid"></div>
-                </div>
+    <!-- SVG connection lines -->
+    <svg class="map-svg" id="mapSvg"></svg>
 
-                <div id="errorMessage" style="display: none;"></div>
-
-                <div class="grid-layout">
-                    <!-- 第一排 -->
-                    <div class="grid-row">
-                        <div class="grid-cell small" id="cell-top-left">
-                            <span class="grid-cell-label">左上</span>
-                            <div class="sticks-area" id="sticks-top-left"></div>
-                        </div>
-                        <div class="grid-cell small" id="cell-top-center">
-                            <span class="grid-cell-label">中上</span>
-                            <div class="sticks-area" id="sticks-top-center"></div>
-                        </div>
-                        <div class="grid-cell small" id="cell-top-right">
-                            <span class="grid-cell-label">右上</span>
-                            <div class="sticks-area" id="sticks-top-right"></div>
-                        </div>
-                    </div>
-
-                    <!-- 第二排 -->
-                    <div class="grid-row">
-                        <div class="grid-cell large" id="cell-middle">
-                            <span class="grid-cell-label">操作區</span>
-                            <div id="middleContent"></div>
-                        </div>
-                    </div>
-
-                    <!-- 第三排 -->
-                    <div class="grid-row">
-                        <div class="grid-cell small" id="cell-bottom-left">
-                            <span class="grid-cell-label">左下</span>
-                            <div class="sticks-area" id="sticks-bottom-left"></div>
-                        </div>
-                        <div class="grid-cell small" id="cell-bottom-center">
-                            <span class="grid-cell-label">中下</span>
-                            <div class="sticks-area" id="sticks-bottom-center"></div>
-                        </div>
-                        <div class="grid-cell small" id="cell-bottom-right">
-                            <span class="grid-cell-label">右下</span>
-                            <div class="sticks-area" id="sticks-bottom-right"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button class="button" id="continueButton" style="display: none;">繼續下一爻</button>
-                    <button class="button secondary" id="resetButton">重新占卜</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== 畫面3: 占卜結果 ==================== -->
-        <div class="screen" id="screen3">
-            <div class="result-screen">
-                <div class="question-display" id="resultQuestionDisplay"></div>
-
-                <!-- Google AdSense 保留欄位 -->
-                <div class="adsense-placeholder">
-                    <div class="adsense-placeholder-text">Google AdSense 廣告位置</div>
-                    <!-- 申請AdSense後，將廣告代碼放在這裡 -->
-                </div>
-
-                <div class="results-panel">
-                    <h2 class="results-title">占卜結果</h2>
-                    <div class="results-grid" id="resultsGrid"></div>
-                    <div class="navigation-buttons">
-                        <button class="button" id="toSurveyButton">查看解讀與填寫問卷</button>
-                        <button class="button secondary" id="resetFromResultButton">重新占卜</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== 畫面4: 占卜結果問卷 ==================== -->
-        <div class="screen" id="screen4">
-            <div class="survey-screen">
-                <div class="question-display" id="surveyQuestionDisplay"></div>
-
-                <!-- Google AdSense 保留欄位 -->
-                <div class="adsense-placeholder">
-                    <div class="adsense-placeholder-text">Google AdSense 廣告位置</div>
-                    <!-- 申請AdSense後，將廣告代碼放在這裡 -->
-                </div>
-
-                <!-- 易經原文顯示區 -->
-                <div class="survey-intro" style="margin-bottom: 30px;">
-                    <h2 style="color: #f0a500; margin-bottom: 20px;">易經解讀</h2>
-                    
-                    <!-- 卦象顯示區域 -->
-                    <div style="display: flex; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center;">
-                        <!-- 本卦 -->
-                        <div style="flex: 1; min-width: 250px; max-width: 400px;">
-                            <h3 style="color: #f0a500; text-align: center; margin-bottom: 15px;">本卦</h3>
-                            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 20px; border: 1px solid rgba(240, 165, 0, 0.3);">
-                                <div id="benguaCanvas" style="display: flex; justify-content: center; margin-bottom: 15px;"></div>
-                                <div id="benguaName" style="text-align: center; font-size: 1.3em; color: #f0a500; font-weight: bold;"></div>
-                                <div id="benguaChanging" style="text-align: center; font-size: 1em; color: #ff9500; margin-top: 10px;"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- 變卦(如果有變爻) -->
-                        <div id="bianGuaContainer" style="flex: 1; min-width: 250px; max-width: 400px; display: none;">
-                            <h3 style="color: #f0a500; text-align: center; margin-bottom: 15px;">變卦</h3>
-                            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 20px; border: 1px solid rgba(255, 149, 0, 0.3);">
-                                <div id="bianguaCanvas" style="display: flex; justify-content: center; margin-bottom: 15px;"></div>
-                                <div id="bianguaName" style="text-align: center; font-size: 1.3em; color: #ff9500; font-weight: bold;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 原文 -->
-                    <div id="yijingTextDisplay" style="
-                        background: rgba(0, 0, 0, 0.3);
-                        padding: 25px;
-                        border-radius: 10px;
-                        white-space: pre-wrap;
-                        line-height: 2;
-                        font-size: 1.05em;
-                        max-height: 500px;
-                        overflow-y: auto;
-                        border: 1px solid rgba(240, 165, 0, 0.3);
-                    "></div>
-                </div>
-
-                <div class="navigation-buttons">
-                    <button class="button secondary" id="backToResult">返回結果頁</button>
-                    <button class="button" id="toFeedbackSurvey">填寫使用心得問卷</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== 畫面5: 使用心得問卷 ==================== -->
-        <div class="screen" id="screen5">
-            <div class="survey-screen">
-                <div class="survey-intro">
-                    <h2>使用心得問卷</h2>
-                    <p>感謝您使用易經大衍占卜系統！</p>
-                    <p>請分享您的使用體驗，幫助我們改進服務品質。</p>
-                </div>
-
-                <div class="survey-container">
-                    <!-- 
-                    ==================== Google 表單嵌入位置 ====================
-                    請將您的「使用心得問卷」Google 表單嵌入代碼放在這裡
-                    
-                    範例：
-                    <iframe src="https://docs.google.com/forms/d/e/YOUR_FEEDBACK_FORM_ID/viewform?embedded=true" 
-                            width="100%" height="1000" frameborder="0" marginheight="0" marginwidth="0">
-                        載入中…
-                    </iframe>
-                    ==================== Google 表單嵌入位置 ====================
-                    -->
-                    
-                    <!-- 示意用的佔位內容 -->
-                    <div style="padding: 40px; text-align: center; color: #888;">
-                        <p style="font-size: 1.2em; margin-bottom: 15px;">📝 使用心得問卷將顯示於此</p>
-                        <p>請在上方註解區域插入您的 Google 表單嵌入代碼</p>
-                    </div>
-                </div>
-
-                <div class="navigation-buttons">
-                    <button class="button secondary" id="backToResultFromFeedback">返回結果頁</button>
-                    <button class="button" id="finishButton">完成</button>
-                </div>
-            </div>
-        </div>
-
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip">
+      <div class="tooltip-inner">
+        <span class="tooltip-tag" id="tt-tag">分類</span>
+        <div class="tooltip-title" id="tt-title">作品標題</div>
+        <div class="tooltip-desc" id="tt-desc">作品描述</div>
+        <a href="#" class="tooltip-link" id="tt-link" target="_blank">前往作品 →</a>
+      </div>
     </div>
 
-    <script>
-        // ==================== 卦名字典 ====================
-        const guaDict = {
-            '111111': '乾卦乾為天䷀',
-            '000111': '否卦天地否䷋',
-            '110111': '履卦天澤履䷉',
-            '001111': '遯卦天山遯䷠',
-            '101111': '同人卦天火同人䷌',
-            '010111': '訟卦天水訟䷅',
-            '100111': '无妄卦天雷无妄䷘',
-            '011111': '姤卦天風姤䷫',
-            
-            '111000': '泰卦地天泰䷊',
-            '000000': '坤卦坤為地䷁',
-            '110000': '臨卦地澤臨䷒',
-            '001000': '謙卦地山謙䷎',
-            '101000': '明夷卦地火明夷䷣',
-            '010000': '師卦地水師䷆',
-            '100000': '復卦地雷復䷗',
-            '011000': '升卦地風升䷭',
-            
-            '111110': '夬卦澤天夬䷪',
-            '000110': '萃卦澤地萃䷬',
-            '110110': '兌卦兌為澤䷹',
-            '001110': '咸卦澤山咸䷞',
-            '101110': '革卦澤火革䷰',
-            '010110': '困卦澤水困䷮',
-            '100110': '隨卦澤雷隨䷐',
-            '011110': '大過卦澤風大過䷛',
-            
-            '111001': '大畜卦山天大畜䷙',
-            '000001': '剝卦山地剝䷖',
-            '110001': '損卦山澤損䷨',
-            '001001': '艮卦艮為山䷳',
-            '101001': '賁卦山火賁䷕',
-            '010001': '蒙卦山水蒙䷃',
-            '100001': '頤卦山雷頤䷚',
-            '011001': '蠱卦山風蠱䷑',
-            
-            '111101': '大有卦火天大有䷍',
-            '000101': '晉卦火地晉䷢',
-            '110101': '睽卦火澤睽䷥',
-            '001101': '旅卦火山旅䷷',
-            '101101': '離卦離為火䷝',
-            '010101': '未濟卦火水未濟䷿',
-            '100101': '噬嗑卦火雷噬嗑䷔',
-            '011101': '鼎卦火風鼎䷱',
-            
-            '111010': '需卦水天需䷄',
-            '000010': '比卦水地比䷇',
-            '110010': '節卦水澤節䷻',
-            '001010': '蹇卦水山蹇䷦',
-            '101010': '既濟卦水火既濟䷾',
-            '010010': '坎卦坎為水䷜',
-            '100010': '屯卦水雷屯䷂',
-            '011010': '井卦水風井䷯',
-            
-            '111100': '大壯卦雷天大壯䷡',
-            '000100': '豫卦雷地豫䷏',
-            '110100': '歸妹卦雷澤歸妹䷵',
-            '001100': '小過卦雷山小過䷽',
-            '101100': '豐卦雷火豐䷶',
-            '010100': '解卦雷水解䷧',
-            '100100': '震卦震為雷䷲',
-            '011100': '恒卦雷風恒䷟',
-            
-            '111011': '小畜卦風天小畜䷈',
-            '000011': '觀卦風地觀䷓',
-            '110011': '中孚卦風澤中孚䷼',
-            '001011': '漸卦風山漸䷴',
-            '101011': '家人卦風火家人䷤',
-            '010011': '渙卦風水渙䷺',
-            '100011': '益卦風雷益䷩',
-            '011011': '巽卦巽為風䷸'
-        };
+    <!-- Legend -->
+    <div class="map-legend">
+      <div class="legend-item">
+        <div class="legend-dot hub-dot"></div>
+        <span>主節點（分類）</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot"></div>
+        <span>子節點（作品）</span>
+      </div>
+    </div>
 
-        // ==================== 易經原文處理 ====================
-        // 從外部yijing-text.js文件獲取易經原文
-        function getYijingText(guaName) {
-            // 檢查外部文件是否成功載入
-            if (typeof YIJING_TEXT === 'undefined') {
-                return {
-                    text: `${guaName}\n\n錯誤：易經文本數據庫未能正確載入。\n請確認 yijing-text.js 文件與此HTML文件在同一目錄下。`,
-                    image: null
-                };
-            }
-            
-            // 從數據庫中獲取對應的卦辭
-            if (YIJING_TEXT[guaName]) {
-                return {
-                    text: YIJING_TEXT[guaName].text || YIJING_TEXT[guaName],
-                    image: YIJING_TEXT[guaName].image || null
-                };
-            } else {
-                return {
-                    text: `${guaName}\n\n此卦的詳細原文尚未添加到數據庫中。\n請在 yijing-text.js 文件中補充此卦的內容。`,
-                    image: null
-                };
-            }
-        }
+    <!-- Coords -->
+    <div class="map-coords" id="mapCoords">α 0.0  δ 0.0</div>
 
-        // 計算變卦
-        function calculateBianGua(binaryStr, changingYaoIndices) {
-            if (changingYaoIndices.length === 0) {
-                return null; // 無變爻,無變卦
-            }
-            
-            // 將本卦的二進制字符串轉換為陣列
-            let bianBinary = binaryStr.split('');
-            
-            // 變爻:0變1,1變0
-            changingYaoIndices.forEach(index => {
-                bianBinary[index] = bianBinary[index] === '1' ? '0' : '1';
-            });
-            
-            const bianBinaryStr = bianBinary.join('');
-            
-            // 查找變卦名稱
-            if (typeof GUA_BINARY !== 'undefined') {
-                for (const [guaName, binary] of Object.entries(GUA_BINARY)) {
-                    if (binary === bianBinaryStr) {
-                        return guaName;
-                    }
-                }
-            }
-            
-            return null;
-        }
+  </div>
+</div>
 
-        // 爻的名稱映射
-        const yaoNames = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
+<!-- INDEX TABLE -->
+<div class="index-section">
+  <div class="index-header">
+    <h2>作品索引</h2>
+    <div class="rule-line"></div>
+  </div>
+  <div class="index-grid" id="indexGrid">
+    <!-- populated by JS -->
+  </div>
+</div>
 
-        // 將數字轉換為0/1 (6,8->0; 7,9->1)
-        function numberToYao(num) {
-            return (num === 7 || num === 9) ? '1' : '0';
-        }
+<div class="page-footer">✦ 玉衡 Alioth.n · 電腦作品頁 · 版權所有 ✦</div>
 
-        // 判斷是否為變爻 (6或9)
-        function isChangingYao(num) {
-            return num === 6 || num === 9;
-        }
 
-        // 計算卦名和變爻
-        function calculateGua(results) {
-            // 將六個數字轉換為二進制字符串
-            const binaryStr = results.map(numberToYao).join('');
-            
-            // 查找卦名
-            const guaName = guaDict[binaryStr] || '未知卦';
-            
-            // 找出變爻位置
-            const changingYaos = [];
-            results.forEach((num, index) => {
-                if (isChangingYao(num)) {
-                    changingYaos.push(yaoNames[index]);
-                }
-            });
-            
-            return {
-                guaName: guaName,
-                changingYaos: changingYaos,
-                binaryStr: binaryStr
-            };
-        }
+<script>
+/* ══════════════════════════════════════════════════════
+   DATA — Edit this section to add/remove works
+   
+   Each node has:
+     id:     unique string
+     label:  short name shown on the map
+     tag:    category label
+     title:  full title in tooltip + index
+     desc:   description
+     url:    link to the work (use '#' as placeholder)
+     hub:    true = big gold hub node (category), false = work node
+     parent: id of the parent hub node (for drawing lines)
+     x, y:  position on map as percentage (0–100)
+══════════════════════════════════════════════════════ */
+const NODES = [
 
-        // ==================== 遊戲狀態 ====================
-        let gameState = {
-            question: '',
-            currentYao: 0,
-            currentRound: 0,
-            totalSticks: 49,
-            results: [],
-            phase: 'idle'
-        };
+  /* === 新增作品（2026-04-07）=== */
+  {
+    id: 'web-04', label: 'VocabQuest', tag: '工具',
+    title: 'VocabQuest — 英語單字練習系統',
+    desc: '互動式英語單字練習工具，幫助記憶與測驗。',
+    url: 'page4.html', parent: 'hub-web', x: 48, y: 25
+  },
+  {
+    id: 'web-05', label: '易經智慧', tag: '網頁',
+    title: '易經智慧 · 線上占卜',
+    desc: '《易經》卦象查詢與解釋工具，支援隨機起卦。',
+    url: 'https://richardduh.github.io/IChingTrans.github.io/', parent: 'hub-web', x: 25, y: 55
+  },
+];
 
-        // ==================== DOM 元素 ====================
-        const screens = {
-            1: document.getElementById('screen1'),
-            2: document.getElementById('screen2'),
-            3: document.getElementById('screen3'),
-            4: document.getElementById('screen4'),
-            5: document.getElementById('screen5')
-        };
+/* ══════════════════════════════════════════════════════
+   RENDER ENGINE
+══════════════════════════════════════════════════════ */
+const canvas  = document.getElementById('mapCanvas');
+const svg     = document.getElementById('mapSvg');
+const tooltip = document.getElementById('tooltip');
+const coordEl = document.getElementById('mapCoords');
 
-        const questionInput = document.getElementById('questionInput');
-        const questionDisplay = document.getElementById('questionDisplay');
-        const resultQuestionDisplay = document.getElementById('resultQuestionDisplay');
-        const surveyQuestionDisplay = document.getElementById('surveyQuestionDisplay');
-        const middleContent = document.getElementById('middleContent');
-        const errorMessage = document.getElementById('errorMessage');
-        const status = document.getElementById('status');
-        const instruction = document.getElementById('instruction');
-        const resultsGrid = document.getElementById('resultsGrid');
-        const resultSurveyContainer = document.getElementById('resultSurveyContainer');
+function pct(v, total) { return (v / 100) * total; }
 
-        const cells = {
-            'top-left': document.getElementById('sticks-top-left'),
-            'top-center': document.getElementById('sticks-top-center'),
-            'top-right': document.getElementById('sticks-top-right'),
-            'bottom-left': document.getElementById('sticks-bottom-left'),
-            'bottom-center': document.getElementById('sticks-bottom-center'),
-            'bottom-right': document.getElementById('sticks-bottom-right')
-        };
+function renderLines() {
+  svg.innerHTML = '';
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
 
-        // ==================== 畫面切換 ====================
-        function showScreen(screenNumber) {
-            Object.values(screens).forEach(screen => screen.classList.remove('active'));
-            screens[screenNumber].classList.add('active');
-            window.scrollTo(0, 0);
-        }
+  NODES.forEach(node => {
+    if (!node.parent) return;
+    const parent = NODES.find(n => n.id === node.parent);
+    if (!parent) return;
 
-        // ==================== 按鈕事件 ====================
-        // 畫面1 → 畫面2
-        document.getElementById('startButton').addEventListener('click', function() {
-            const question = questionInput.value.trim();
-            if (!question) {
-                alert('請先輸入問題！');
-                return;
-            }
-            gameState.question = question;
-            questionDisplay.textContent = `問題：${question}`;
-            showScreen(2);
-            initializeDivination();
-        });
+    const x1 = pct(parent.x, W), y1 = pct(parent.y, H);
+    const x2 = pct(node.x, W),   y2 = pct(node.y, H);
 
-        // 重新占卜
-        document.getElementById('resetButton').addEventListener('click', resetAll);
-        document.getElementById('resetFromResultButton').addEventListener('click', resetAll);
+    // Dashed connection line
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', 'rgba(212,185,106,0.25)');
+    line.setAttribute('stroke-width', '1');
+    line.setAttribute('stroke-dasharray', '4 5');
+    svg.appendChild(line);
+  });
+}
 
-        // 畫面3 → 畫面4
-        document.getElementById('toSurveyButton').addEventListener('click', function() {
-            surveyQuestionDisplay.textContent = `問題：${gameState.question}`;
-            
-            // 計算卦名和變爻
-            const guaInfo = calculateGua(gameState.results);
-            const yijingData = getYijingText(guaInfo.guaName);
-            
-            // 顯示易經原文
-            const yijingTextDisplay = document.getElementById('yijingTextDisplay');
-            yijingTextDisplay.textContent = yijingData.text;
-            
-            // 顯示本卦
-            const benguaName = document.getElementById('benguaName');
-            const benguaChanging = document.getElementById('benguaChanging');
-            const benguaCanvas = document.getElementById('benguaCanvas');
-            
-            benguaName.textContent = guaInfo.guaName;
-            
-            // 顯示變爻信息
-            if (guaInfo.changingYaos.length > 0) {
-                benguaChanging.textContent = `變爻：${guaInfo.changingYaos.join('、')}`;
-            } else {
-                benguaChanging.textContent = '無變爻';
-            }
-            
-            // 顯示本卦圖片
-            benguaCanvas.innerHTML = '';
-            if (yijingData.image) {
-                const img = document.createElement('img');
-                img.src = yijingData.image;
-                img.alt = guaInfo.guaName;
-                img.style.maxWidth = '200px';
-                img.style.height = 'auto';
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    benguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">圖片載入失敗</div>';
-                };
-                benguaCanvas.appendChild(img);
-            } else {
-                benguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">暫無卦圖</div>';
-            }
-            
-            // 計算並顯示變卦
-            const bianGuaContainer = document.getElementById('bianGuaContainer');
-            if (guaInfo.changingYaos.length > 0 && typeof GUA_BINARY !== 'undefined') {
-                // 找出變爻的索引
-                const changingIndices = [];
-                gameState.results.forEach((num, index) => {
-                    if (isChangingYao(num)) {
-                        changingIndices.push(index);
-                    }
-                });
-                
-                const bianGuaName = calculateBianGua(guaInfo.binaryStr, changingIndices);
-                
-                if (bianGuaName) {
-                    const bianYijingData = getYijingText(bianGuaName);
-                    
-                    bianGuaContainer.style.display = 'block';
-                    document.getElementById('bianguaName').textContent = bianGuaName;
-                    
-                    const bianguaCanvas = document.getElementById('bianguaCanvas');
-                    bianguaCanvas.innerHTML = '';
-                    
-                    if (bianYijingData.image) {
-                        const img = document.createElement('img');
-                        img.src = bianYijingData.image;
-                        img.alt = bianGuaName;
-                        img.style.maxWidth = '200px';
-                        img.style.height = 'auto';
-                        img.onerror = function() {
-                            this.style.display = 'none';
-                            bianguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">圖片載入失敗</div>';
-                        };
-                        bianguaCanvas.appendChild(img);
-                    } else {
-                        bianguaCanvas.innerHTML = '<div style="color: #888; font-size: 0.9em;">暫無卦圖</div>';
-                    }
-                } else {
-                    bianGuaContainer.style.display = 'none';
-                }
-            } else {
-                bianGuaContainer.style.display = 'none';
-            }
-            
-            showScreen(4);
-        });
+function renderNodes() {
+  // Remove old nodes
+  canvas.querySelectorAll('.node').forEach(el => el.remove());
 
-        // 畫面4 → 畫面3
-        document.getElementById('backToResult').addEventListener('click', function() {
-            showScreen(3);
-        });
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
 
-        // 畫面4 → 畫面5
-        document.getElementById('toFeedbackSurvey').addEventListener('click', function() {
-            showScreen(5);
-        });
+  NODES.forEach(node => {
+    const el = document.createElement('div');
+    el.className = 'node' + (node.hub ? ' hub' : '');
+    el.style.left = pct(node.x, W) + 'px';
+    el.style.top  = pct(node.y, H) + 'px';
+    el.dataset.id = node.id;
 
-        // 畫面5 → 畫面3
-        document.getElementById('backToResultFromFeedback').addEventListener('click', function() {
-            showScreen(3);
-        });
+    el.innerHTML = `
+      <div class="node-dot"></div>
+      <div class="node-label">${node.label}</div>
+    `;
 
-        // 完成
-        document.getElementById('finishButton').addEventListener('click', function() {
-            if (confirm('感謝您的參與！是否要重新開始占卜？')) {
-                resetAll();
-            }
-        });
+    el.addEventListener('mouseenter', (e) => showTooltip(node, el));
+    el.addEventListener('mouseleave', hideTooltip);
+    el.addEventListener('click', () => {
+      if (node.url && node.url !== '#') window.open(node.url, '_blank');
+    });
 
-        // ==================== 占卜邏輯 ====================
-        function renderSticks(cellId, count, horizontal = false) {
-            const cell = cells[cellId];
-            cell.innerHTML = '';
-            
-            for (let i = 0; i < count; i++) {
-                const stick = document.createElement('div');
-                stick.className = horizontal ? 'stick horizontal' : 'stick';
-                cell.appendChild(stick);
-            }
+    canvas.appendChild(el);
+  });
+}
 
-            const parentCell = cell.parentElement;
-            let countDisplay = parentCell.querySelector('.stick-count');
-            if (countDisplay) countDisplay.remove();
-            
-            if (count > 0) {
-                countDisplay = document.createElement('div');
-                countDisplay.className = 'stick-count';
-                countDisplay.textContent = count;
-                parentCell.appendChild(countDisplay);
-            }
-        }
+/* Tooltip positioning */
+function showTooltip(node, el) {
+  document.getElementById('tt-tag').textContent   = node.tag;
+  document.getElementById('tt-title').textContent = node.title;
+  document.getElementById('tt-desc').textContent  = node.desc;
+  const link = document.getElementById('tt-link');
+  link.href = node.url;
+  link.style.display = (node.url === '#') ? 'none' : 'inline-block';
 
-        function clearCell(cellId) {
-            cells[cellId].innerHTML = '';
-            const countDisplay = cells[cellId].parentElement.querySelector('.stick-count');
-            if (countDisplay) countDisplay.remove();
-        }
+  const rect   = canvas.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+  let left = elRect.left - rect.left + 20;
+  let top  = elRect.top  - rect.top  - 10;
 
-        function clearBottomRow() {
-            clearCell('bottom-left');
-            clearCell('bottom-center');
-            clearCell('bottom-right');
-        }
+  // Flip left if near right edge
+  if (left + 240 > canvas.offsetWidth) left = left - 260;
+  // Flip down if near top
+  if (top < 0) top = top + elRect.height + 20;
 
-        function highlightCell(cellElement) {
-            document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('active'));
-            if (cellElement) {
-                cellElement.classList.add('active');
-            }
-        }
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top  + 'px';
+  tooltip.classList.add('visible');
+}
+function hideTooltip() { tooltip.classList.remove('visible'); }
 
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            errorMessage.className = 'error-message';
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 3000);
-        }
+/* Coords display */
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+  const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+  coordEl.textContent = `α ${x}  δ ${y}`;
+});
 
-        function createDividingInterface() {
-            middleContent.innerHTML = `
-                <div class="dividing-interface">
-                    <div class="piles-display">
-                        <div class="pile">
-                            <div class="pile-label">左堆</div>
-                            <div class="pile-sticks" id="leftPileSticks"></div>
-                        </div>
-                        <div class="pile">
-                            <div class="pile-label">右堆</div>
-                            <div class="pile-sticks" id="rightPileSticks"></div>
-                        </div>
-                    </div>
-                    <input type="range" min="4" max="${gameState.totalSticks - 4}" value="${Math.floor(gameState.totalSticks / 2)}" class="slider" id="stickSlider">
-                    <button class="button" id="confirmButton">確認分配</button>
-                </div>
-            `;
+/* Build index table */
+function renderIndex() {
+  const grid = document.getElementById('indexGrid');
+  const works = NODES.filter(n => !n.hub);
+  grid.innerHTML = works.map(n => `
+    <div class="index-item">
+      <span class="index-cat">${n.tag}</span>
+      <h3>${n.title}</h3>
+      <p>${n.desc}</p>
+      ${n.url !== '#' ? `<a href="${n.url}" target="_blank">前往作品 →</a>` : '<span style="font-size:0.68rem;color:var(--muted);">（即將上線）</span>'}
+    </div>
+  `).join('');
+}
 
-            const slider = document.getElementById('stickSlider');
-            const leftPileSticks = document.getElementById('leftPileSticks');
-            const rightPileSticks = document.getElementById('rightPileSticks');
-            const confirmButton = document.getElementById('confirmButton');
+/* Init + resize */
+function init() {
+  renderLines();
+  renderNodes();
+  renderIndex();
+}
 
-            slider.addEventListener('input', function() {
-                const leftValue = parseInt(this.value);
-                const rightValue = gameState.totalSticks - leftValue;
-                
-                renderPileSticks(leftPileSticks, leftValue);
-                renderPileSticks(rightPileSticks, rightValue);
-            });
+init();
+window.addEventListener('resize', init);
 
-            const initialLeft = parseInt(slider.value);
-            renderPileSticks(leftPileSticks, initialLeft);
-            renderPileSticks(rightPileSticks, gameState.totalSticks - initialLeft);
+/* Date */
+const d = new Date();
+document.getElementById('today-date').textContent =
+  d.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', timeZone:'Asia/Taipei' });
+</script>
 
-            confirmButton.addEventListener('click', () => confirmDivision(slider));
-        }
-
-        function renderPileSticks(container, count) {
-            container.innerHTML = '';
-            for (let i = 0; i < count; i++) {
-                const stick = document.createElement('div');
-                stick.className = 'stick';
-                container.appendChild(stick);
-            }
-        }
-
-        function showProcessingSticks(count) {
-            middleContent.innerHTML = '';
-            const sticksArea = document.createElement('div');
-            sticksArea.className = 'sticks-area';
-            
-            for (let i = 0; i < count; i++) {
-                const stick = document.createElement('div');
-                stick.className = 'stick';
-                sticksArea.appendChild(stick);
-            }
-            
-            middleContent.appendChild(sticksArea);
-        }
-
-        async function initializeDivination() {
-            gameState = {
-                question: gameState.question,
-                currentYao: 0,
-                currentRound: 0,
-                totalSticks: 49,
-                results: [],
-                phase: 'initializing'
-            };
-
-            Object.keys(cells).forEach(clearCell);
-            middleContent.innerHTML = '';
-
-            status.textContent = `準備大衍之數...`;
-            instruction.textContent = '大衍之數五十，其用四十有九';
-
-            // 動畫：顯示50根木棒
-            showProcessingSticks(50);
-            highlightCell(document.getElementById('cell-middle'));
-            await sleep(1500);
-
-            // 動畫：取出1根放到中上
-            status.textContent = '取出一根放置於中上位置';
-            instruction.textContent = '虛一不用';
-            
-            // 添加移動動畫
-            const sticks = middleContent.querySelectorAll('.stick');
-            if (sticks.length > 0) {
-                sticks[0].classList.add('moving');
-            }
-            
-            await sleep(800);
-            
-            renderSticks('top-center', 1);
-            showProcessingSticks(49);
-            await sleep(1000);
-
-            gameState.totalSticks = 49;
-            gameState.phase = 'idle';
-
-            status.textContent = `${yaoNames[gameState.currentYao]} - 第 ${gameState.currentRound + 1} 輪`;
-            instruction.textContent = '請將木棒分成兩堆';
-
-            startNextRound();
-        }
-
-        function startNextRound() {
-            clearBottomRow();
-            middleContent.innerHTML = '';
-
-            showProcessingSticks(gameState.totalSticks);
-            highlightCell(document.getElementById('cell-middle'));
-
-            setTimeout(() => {
-                createDividingInterface();
-                gameState.phase = 'dividing';
-            }, 500);
-        }
-
-        async function confirmDivision(slider) {
-            if (gameState.phase !== 'dividing') return;
-
-            const leftValue = parseInt(slider.value);
-            const rightValue = gameState.totalSticks - leftValue;
-
-            if (leftValue < 4 || rightValue < 4) {
-                showError('每一堆至少要有4根木棒！請重新分配。');
-                return;
-            }
-
-            gameState.phase = 'processing';
-
-            let a = leftValue;
-            let b = rightValue;
-
-            middleContent.innerHTML = '';
-            await sleep(300);
-
-            // 步驟1: 左堆取1根放到左下
-            a = a - 1;
-            renderSticks('bottom-left', 1);
-            await sleep(800);
-
-            // 步驟2: 左堆除4取餘數，放到中下
-            const leftRemainder = a % 4 === 0 ? 4 : a % 4;
-            a = a - leftRemainder;
-            renderSticks('bottom-center', leftRemainder);
-            await sleep(800);
-
-            // 步驟3: 右堆除4取餘數，放到右下
-            const rightRemainder = b % 4 === 0 ? 4 : b % 4;
-            b = b - rightRemainder;
-            renderSticks('bottom-right', rightRemainder);
-            await sleep(800);
-
-            // 步驟4: 移到左上角橫放
-            const totalBottom = 1 + leftRemainder + rightRemainder;
-            clearBottomRow();
-            const currentTopLeft = cells['top-left'].querySelectorAll('.stick').length;
-            clearCell('top-left');
-            renderSticks('top-left', currentTopLeft + totalBottom, true);
-            await sleep(800);
-
-            // 合併剩餘木棒
-            gameState.totalSticks = a + b;
-            showProcessingSticks(gameState.totalSticks);
-            await sleep(500);
-
-            gameState.currentRound++;
-            
-            if (gameState.currentRound >= 3) {
-                // 完成一爻
-                const yaoValue = gameState.totalSticks / 4;
-                gameState.results.push(yaoValue);
-                
-                // 更新即時顯示
-                updateLiveResults();
-                
-                status.textContent = `${yaoNames[gameState.currentYao]}完成！得到數字：${yaoValue}`;
-                instruction.textContent = gameState.currentYao < 5 ? '點擊「繼續」進行下一爻' : '占卜完成！';
-                
-                gameState.currentYao++;
-                gameState.currentRound = 0;
-                gameState.totalSticks = 49;
-
-                if (gameState.currentYao >= 6) {
-                    finishDivination();
-                } else {
-                    document.getElementById('continueButton').style.display = 'inline-block';
-                    middleContent.innerHTML = '';
-                    highlightCell(null);
-                }
-            } else {
-                status.textContent = `${yaoNames[gameState.currentYao]} - 第 ${gameState.currentRound + 1} 輪`;
-                instruction.textContent = '請將木棒分成兩堆';
-                await sleep(500);
-                startNextRound();
-            }
-        }
-
-        document.getElementById('continueButton').addEventListener('click', function() {
-            this.style.display = 'none';
-            clearCell('top-left');
-            renderSticks('top-center', 1);
-            startNextRound();
-        });
-
-        function finishDivination() {
-            status.textContent = '占卜完成！';
-            instruction.textContent = '六個數字已全部得出，點擊下方按鈕查看結果';
-            middleContent.innerHTML = '';
-            highlightCell(null);
-            
-            // 顯示查看結果按鈕
-            document.getElementById('continueButton').style.display = 'none';
-            const buttonGroup = document.querySelector('#screen2 .button-group');
-            
-            // 創建查看結果按鈕(如果不存在)
-            let viewResultButton = document.getElementById('viewResultButton');
-            if (!viewResultButton) {
-                viewResultButton = document.createElement('button');
-                viewResultButton.id = 'viewResultButton';
-                viewResultButton.className = 'button';
-                viewResultButton.textContent = '查看占卜結果';
-                viewResultButton.addEventListener('click', showResultScreen);
-                buttonGroup.insertBefore(viewResultButton, buttonGroup.firstChild);
-            }
-            viewResultButton.style.display = 'inline-block';
-        }
-
-        function showResultScreen() {
-            resultQuestionDisplay.textContent = `問題：${gameState.question}`;
-            
-            // 計算卦名和變爻
-            const guaInfo = calculateGua(gameState.results);
-            
-            resultsGrid.innerHTML = '';
-            
-            // 顯示卦名和變爻資訊
-            const guaInfoDiv = document.createElement('div');
-            guaInfoDiv.style.cssText = `
-                background: rgba(240, 165, 0, 0.15);
-                border: 3px solid #f0a500;
-                border-radius: 15px;
-                padding: 25px;
-                margin-bottom: 20px;
-                text-align: center;
-            `;
-            
-            const guaNameElement = document.createElement('div');
-            guaNameElement.style.cssText = `
-                font-size: 2em;
-                font-weight: bold;
-                color: #f0a500;
-                margin-bottom: 15px;
-            `;
-            guaNameElement.textContent = guaInfo.guaName;
-            guaInfoDiv.appendChild(guaNameElement);
-            
-            if (guaInfo.changingYaos.length > 0) {
-                const changingYaoElement = document.createElement('div');
-                changingYaoElement.style.cssText = `
-                    font-size: 1.3em;
-                    color: #ff9500;
-                    margin-top: 10px;
-                `;
-                changingYaoElement.textContent = `變爻：${guaInfo.changingYaos.join('、')}`;
-                guaInfoDiv.appendChild(changingYaoElement);
-            } else {
-                const noChangeElement = document.createElement('div');
-                noChangeElement.style.cssText = `
-                    font-size: 1.2em;
-                    color: #b0b0b0;
-                    margin-top: 10px;
-                `;
-                noChangeElement.textContent = '無變爻';
-                guaInfoDiv.appendChild(noChangeElement);
-            }
-            
-            resultsGrid.appendChild(guaInfoDiv);
-            
-            // 顯示六個爻的詳細數字
-            gameState.results.forEach((num, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
-                
-                // 判斷是否為變爻，添加特殊樣式
-                if (isChangingYao(num)) {
-                    itemDiv.style.borderColor = '#ff9500';
-                    itemDiv.style.background = 'rgba(255, 149, 0, 0.15)';
-                }
-                
-                itemDiv.innerHTML = `
-                    <div class="result-label">${yaoNames[index]}${isChangingYao(num) ? ' ⚡' : ''}</div>
-                    <div class="result-number">${num}</div>
-                `;
-                resultsGrid.appendChild(itemDiv);
-            });
-            
-            showScreen(3);
-        }
-
-        // 更新即時結果顯示
-        function updateLiveResults() {
-            const liveResults = document.getElementById('liveResults');
-            const liveResultsGrid = document.getElementById('liveResultsGrid');
-            
-            if (gameState.results.length === 0) {
-                liveResults.style.display = 'none';
-                return;
-            }
-            
-            liveResults.style.display = 'block';
-            liveResultsGrid.innerHTML = '';
-            
-            gameState.results.forEach((num, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'result-item';
-                
-                if (isChangingYao(num)) {
-                    itemDiv.style.borderColor = '#ff9500';
-                    itemDiv.style.background = 'rgba(255, 149, 0, 0.15)';
-                }
-                
-                itemDiv.innerHTML = `
-                    <div class="result-label">${yaoNames[index]}${isChangingYao(num) ? ' ⚡' : ''}</div>
-                    <div class="result-number">${num}</div>
-                `;
-                liveResultsGrid.appendChild(itemDiv);
-            });
-        }
-
-        function resetAll() {
-            gameState = {
-                question: '',
-                currentYao: 0,
-                currentRound: 0,
-                totalSticks: 49,
-                results: [],
-                phase: 'idle'
-            };
-
-            Object.keys(cells).forEach(clearCell);
-            middleContent.innerHTML = '';
-            questionInput.value = '';
-            resultsGrid.innerHTML = '';
-            document.getElementById('continueButton').style.display = 'none';
-            
-            // 隱藏即時結果
-            document.getElementById('liveResults').style.display = 'none';
-            
-            // 隱藏查看結果按鈕
-            const viewResultButton = document.getElementById('viewResultButton');
-            if (viewResultButton) {
-                viewResultButton.style.display = 'none';
-            }
-            
-            showScreen(1);
-        }
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        // 初始化
-        renderSticks('top-center', 1);
-    </script>
 </body>
 </html>
