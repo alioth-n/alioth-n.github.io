@@ -363,7 +363,7 @@ function renderQuestion(){
   document.getElementById('quiz-card').className='quiz-card';
 
   // Sentence
-  const re=new RegExp('\\b'+escapeRegex(q.word)+'\\b','i');
+  const re=new RegExp(escapeRegex(q.word),'i');
   document.getElementById('sentence-display').innerHTML=
     q.sentence.replace(re,`<span class="blank" id="word-blank">${'_'.repeat(Math.min(q.word.length,8))}</span>`);
 
@@ -420,10 +420,16 @@ function renderCloze(q){
   const others=shuffle(questions.filter(x=>x.word.toLowerCase()!==q.word.toLowerCase())).slice(0,3).map(x=>x.word);
   const choices=shuffle([q.word,...others]);
   area.innerHTML=choices.map((w,i)=>
-    `<button class="choice-btn" id="ch-${i}" onclick="confirmCloze(${i},'${w.replace(/'/g,"\\'")}')">
-      <span class="choice-letter">${LETTERS[i]}</span>${w}
+    `<button class="choice-btn" id="ch-${i}">
+      <span class="choice-letter">${LETTERS[i]}</span><span class="choice-text"></span>
     </button>`
   ).join('');
+  // 用 JS 設定文字，完全避開 HTML 特殊字元問題
+  choices.forEach((w,i)=>{
+    const btn=document.getElementById('ch-'+i);
+    btn.querySelector('.choice-text').textContent=w;
+    btn.addEventListener('click',()=>confirmCloze(i,w));
+  });
 }
 
 function confirmCloze(idx,chosen){
@@ -431,12 +437,11 @@ function confirmCloze(idx,chosen){
   answered=true;
   const q=questions[qIdx];
   const ok=chosen.toLowerCase()===q.word.toLowerCase();
-  // Mark buttons
-  document.querySelectorAll('.choice-btn').forEach(btn=>{
+  document.querySelectorAll('.choice-btn').forEach((btn,i)=>{
     btn.disabled=true;
-    const w=btn.textContent.replace(/^[A-D]/,'').trim();
+    const w=btn.querySelector('.choice-text').textContent;
     const isCorrect=w.toLowerCase()===q.word.toLowerCase();
-    const isChosen=btn===document.getElementById('ch-'+idx);
+    const isChosen=i===idx;
     if(isChosen&&ok)btn.className='choice-btn ok';
     else if(isChosen&&!ok)btn.className='choice-btn err';
     else if(isCorrect)btn.className='choice-btn show-correct';
@@ -517,7 +522,7 @@ function showResult(){
   } else {
     wl.innerHTML=`<div class="section-label" style="margin-bottom:14px;">答錯的單字（${wrongItems.length} 題）</div>`
       +wrongItems.map(item=>{
-        const re=new RegExp('\\b'+escapeRegex(item.word)+'\\b','i');
+        const re=new RegExp(escapeRegex(item.word),'i');
         const sentHtml=item.sentence.replace(re,`<em>${item.word}</em>`);
         return `<div class="wrong-item">
           <div class="wrong-item-word">${item.word}</div>
