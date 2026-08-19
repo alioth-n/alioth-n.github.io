@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>愛情故事理論 67 題心理測驗</title>
+    <!-- html2canvas 用於下載結果圖片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #2d3436;
+            --muted: #636e72;
+            --border: #dfe6e9;
+            --danger: #e17055;
+            --success: #00b894;
+            --warning: #fdcb6e;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 30px 25px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+        .progress-container {
+            background: #ecf0f1;
+            border-radius: 20px;
+            height: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            position: sticky;
+            top: 10px;
+            z-index: 10;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 20px;
+        }
+        .progress-text {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+        .question-item {
+            margin-bottom: 18px;
+            padding: 10px;
+            border-bottom: 1px dashed #eee;
+        }
+        .question-text {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .option-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: white;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+        .option-label:hover {
+            border-color: var(--secondary);
+            background: #f0edff;
+        }
+        .option-label input[type="radio"] {
+            accent-color: var(--primary);
+            margin: 0;
+            cursor: pointer;
+        }
+        .option-label.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .option-label.selected input[type="radio"] {
+            accent-color: white;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            margin: 10px 5px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a4bd1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108,92,231,0.4);
+        }
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: #f0edff;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .result-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result-card {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .result-card h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .bar-label {
+            width: 100px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .bar-track {
+            flex: 1;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.8s ease;
+        }
+        .bar-value {
+            width: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .story-result-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: white;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .story-result-item h3 {
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+            color: #2d3436;
+        }
+        .story-result-item .story-score {
+            font-weight: 700;
+            color: var(--primary);
+            margin-left: 10px;
+        }
+        .story-result-item p {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        .danger-box {
+            background: #fdecea;
+            border-left: 4px solid var(--danger);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 20px 15px; }
+            .options { gap: 5px; }
+            .option-label { padding: 4px 6px; font-size: 0.8rem; }
+            .bar-label { width: 70px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="quizContainer">
+        <h1>💘 愛情故事理論 67 題心理測驗</h1>
+        <p class="subtitle">了解你反覆上演的愛情劇本｜題目隨機排列，請直覺作答</p>
+        
+        <div class="progress-text">已作答：<span id="answeredCount">0</span> / 67 題</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="quizBody"></div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="submitBtn">送出測驗，查看我的愛情劇本</button>
+            <button class="btn btn-outline" id="resetBtn">重新作答</button>
+        </div>
+    </div>
+
+    <div class="container result-section" id="resultSection">
+        <h2>📊 你的愛情故事分析結果</h2>
+        <div id="resultContent"></div>
+        <div class="actions">
+            <button class="btn btn-primary" id="downloadBtn">下載結果圖片</button>
+            <button class="btn btn-outline" id="retakeBtn">重新測驗</button>
+        </div>
+    </div>
+
+    <footer>非專業性心理測驗，僅供自我探索參考。如需深入協助，請諮詢專業心理師。</footer>
+
+    <script>
+        // ========== 測驗資料 ==========
+        const questions = [
+            // 不對稱故事（1-18）
+            { id: 1, text: "我喜歡在關係中扮演教導對方的角色。", story: "師生故事", category: "不對稱故事" },
+            { id: 2, text: "我容易被有能力引導我的人吸引。", story: "師生故事", category: "不對稱故事" },
+            { id: 3, text: "我覺得伴侶之間有一方像老師、一方像學生是很自然的事。", story: "師生故事", category: "不對稱故事" },
+            { id: 4, text: "我願意為了伴侶的幸福犧牲自己的需求。", story: "犧牲故事", category: "不對稱故事" },
+            { id: 5, text: "我覺得愛一個人就是無條件付出，即使對方沒有同等回報。", story: "犧牲故事", category: "不對稱故事" },
+            { id: 6, text: "如果伴侶需要，我可以放棄自己的夢想。", story: "犧牲故事", category: "不對稱故事" },
+            { id: 7, text: "我認為關係中總要有一個人做主要決定。", story: "政府故事", category: "不對稱故事" },
+            { id: 8, text: "我喜歡和伴侶明確分配誰負責哪些事情。", story: "政府故事", category: "不對稱故事" },
+            { id: 9, text: "我認為關係中應該有一個主要負責人，而不是凡事都要討論。", story: "政府故事", category: "不對稱故事" },
+            { id: 10, text: "我會忍不住想查看伴侶的手機或行蹤。", story: "警察故事", category: "不對稱故事" },
+            { id: 11, text: "我覺得愛一個人就會想知道他所有的事情。", story: "警察故事", category: "不對稱故事" },
+            { id: 12, text: "我需要知道伴侶的手機密碼或行蹤，才會感到安心。", story: "警察故事", category: "不對稱故事" },
+            { id: 13, text: "性吸引力是我決定是否和一個人在一起的關鍵。", story: "色情故事", category: "不對稱故事" },
+            { id: 14, text: "如果性生活不和諧，關係就很難維持。", story: "色情故事", category: "不對稱故事" },
+            { id: 15, text: "我常被伴侶的外表或性魅力吸引，其他條件其次。", story: "色情故事", category: "不對稱故事" },
+            { id: 16, text: "我有時會被讓我感到害怕或不安的人吸引。", story: "恐怖故事", category: "不對稱故事" },
+            { id: 17, text: "我覺得充滿強烈情緒起伏的關係才不算無聊。", story: "恐怖故事", category: "不對稱故事" },
+            { id: 18, text: "即使關係讓我痛苦，我也很難離開。", story: "恐怖故事", category: "不對稱故事" },
+
+            // 物件故事（19-39）
+            { id: 19, text: "我容易被想法或行為很奇特、像外星人一樣難以理解的人吸引。", story: "科幻故事", category: "物件故事" },
+            { id: 20, text: "我覺得伴侶之間保持一點神祕和怪異很有趣。", story: "科幻故事", category: "物件故事" },
+            { id: 21, text: "我喜歡和思考方式完全不同於常人的人交往。", story: "科幻故事", category: "物件故事" },
+            { id: 22, text: "我對伴侶有明確的條件清單（如身高、學歷、收入）。", story: "收藏故事", category: "物件故事" },
+            { id: 23, text: "伴侶的條件是否符合我的標準，比感覺更重要。", story: "收藏故事", category: "物件故事" },
+            { id: 24, text: "我常覺得伴侶像是我人生成就的一部分。", story: "收藏故事", category: "物件故事" },
+            { id: 25, text: "我非常重視伴侶的外貌和打扮。", story: "藝術故事", category: "物件故事" },
+            { id: 26, text: "我喜歡別人稱讚我伴侶的外表。", story: "藝術故事", category: "物件故事" },
+            { id: 27, text: "如果伴侶變胖或不再好看，我會很在意。", story: "藝術故事", category: "物件故事" },
+            { id: 28, text: "我選擇伴侶時，會希望對方能幫我走出過去的傷痛。", story: "復原故事", category: "物件故事" },
+            { id: 29, text: "我覺得愛情可以治療我內心的創傷。", story: "復原故事", category: "物件故事" },
+            { id: 30, text: "我需要伴侶來讓我感覺完整。", story: "復原故事", category: "物件故事" },
+            { id: 31, text: "我認為伴侶關係最重要的功能是建立一個穩定的家庭。", story: "家庭故事", category: "物件故事" },
+            { id: 32, text: "只要家庭生活運作良好，伴侶之間有沒有激情不重要。", story: "家庭故事", category: "物件故事" },
+            { id: 33, text: "我選擇伴侶時，很看重對方是否適合當孩子的父母或家庭支柱。", story: "家庭故事", category: "物件故事" },
+            { id: 34, text: "我覺得愛情是神聖的，需要用虔誠的態度對待。", story: "宗教故事", category: "物件故事" },
+            { id: 35, text: "我願意按照信仰或價值觀的教導來經營關係。", story: "宗教故事", category: "物件故事" },
+            { id: 36, text: "我常把伴侶理想化，像崇拜一樣看待對方。", story: "宗教故事", category: "物件故事" },
+            { id: 37, text: "我覺得愛情就像一場遊戲，有輸有贏。", story: "遊戲故事", category: "物件故事" },
+            { id: 38, text: "我喜歡在關係中保持優勢，不讓自己吃虧。", story: "遊戲故事", category: "物件故事" },
+            { id: 39, text: "我會用一些策略來測試伴侶是否在乎我。", story: "遊戲故事", category: "物件故事" },
+
+            // 協作故事（40-51）
+            { id: 40, text: "我認為好的關係是一起成長、一起探索世界。", story: "旅行故事", category: "協作故事" },
+            { id: 41, text: "我希望伴侶能和我一起嘗試新事物，而不是安於現狀。", story: "旅行故事", category: "協作故事" },
+            { id: 42, text: "我覺得伴侶之間最重要的是一起前進的方向。", story: "旅行故事", category: "協作故事" },
+            { id: 43, text: "我相信感情需要每天用心經營，像照顧植物一樣。", story: "園藝故事", category: "協作故事" },
+            { id: 44, text: "我願意花時間解決關係中的小問題，像為植物除草。", story: "園藝故事", category: "協作故事" },
+            { id: 45, text: "我覺得關係如果放任不管，就會慢慢枯萎。", story: "園藝故事", category: "協作故事" },
+            { id: 46, text: "我喜歡和伴侶一起規劃生活，把兩個人的未來縫在一起。", story: "縫紉故事", category: "協作故事" },
+            { id: 47, text: "我覺得伴侶之間應該互相配合，像拼圖一樣互補。", story: "縫紉故事", category: "協作故事" },
+            { id: 48, text: "我認為伴侶關係像合夥經營，需要分工明確。", story: "商業故事", category: "協作故事" },
+            { id: 49, text: "我會評估這段關係帶給我什麼，以及我付出多少是否值得。", story: "商業故事", category: "協作故事" },
+            { id: 50, text: "沒有伴侶在身邊，我會感到焦慮不安。", story: "成癮故事", category: "協作故事" },
+            { id: 51, text: "我需要伴侶不斷回應我，否則我會很難受。", story: "成癮故事", category: "協作故事" },
+
+            // 敘事故事（52-59）
+            { id: 52, text: "我期待遇到王子或公主，從此幸福快樂。", story: "幻想故事", category: "敘事故事" },
+            { id: 53, text: "我相信世界上有完美的愛情，只是還沒遇到。", story: "幻想故事", category: "敘事故事" },
+            { id: 54, text: "我非常珍惜和伴侶共同創造的回憶。", story: "歷史故事", category: "敘事故事" },
+            { id: 55, text: "我覺得過去的經歷決定了我們現在的關係。", story: "歷史故事", category: "敘事故事" },
+            { id: 56, text: "我喜歡用理性分析感情問題，而不是只憑感覺。", story: "科學故事", category: "敘事故事" },
+            { id: 57, text: "我常試圖找出關係中的規律或公式。", story: "科學故事", category: "敘事故事" },
+            { id: 58, text: "我覺得經營感情有標準步驟，按照步驟走就會幸福。", story: "食譜故事", category: "敘事故事" },
+            { id: 59, text: "如果關係出問題，我會想找一套正確的方法來修正。", story: "食譜故事", category: "敘事故事" },
+
+            // 類型故事（60-67）
+            { id: 60, text: "我覺得吵架也是一種溝通，打是情罵是愛。", story: "戰爭故事", category: "類型故事" },
+            { id: 61, text: "我容易被有挑戰性、會和我爭執的人吸引。", story: "戰爭故事", category: "類型故事" },
+            { id: 62, text: "我喜歡在關係中安排儀式感，像演一場戲。", story: "劇場故事", category: "類型故事" },
+            { id: 63, text: "我會注意自己在伴侶面前的表現，像在舞臺上一樣。", story: "劇場故事", category: "類型故事" },
+            { id: 64, text: "我習慣用開玩笑的方式化解關係中的嚴肅問題。", story: "幽默故事", category: "類型故事" },
+            { id: 65, text: "我覺得關係不要太認真，輕鬆一點才能長久。", story: "幽默故事", category: "類型故事" },
+            { id: 66, text: "我喜歡在伴侶面前保持一點神祕感。", story: "神祕故事", category: "類型故事" },
+            { id: 67, text: "我覺得讓對方慢慢了解我，比一開始就全盤托出更有吸引力。", story: "神祕故事", category: "類型故事" }
+        ];
+
+        // 故事描述
+        const storyDescriptions = {
+            "師生故事": "喜歡教導或被引導，關係中常有權威與學習的角色。",
+            "犧牲故事": "認為愛就是無條件付出，容易忽略自己的需求。",
+            "政府故事": "重視權力分配，可能傾向獨裁或民主的互動模式。",
+            "警察故事": "愛與監控、查勤交織，常有不安全感與控制。",
+            "色情故事": "將伴侶視為性吸引力與滿足的對象，外貌與性魅力主導。",
+            "恐怖故事": "透過恐懼、痛苦或強烈情緒維持關係，容易深陷其中。",
+            "科幻故事": "被伴侶的奇特、神秘或難以理解的特質吸引。",
+            "收藏故事": "對伴侶有明確條件清單，像收集符合標準的物件。",
+            "藝術故事": "高度重視伴侶的外表形象，將其視為藝術品。",
+            "復原故事": "將愛情視為療癒過去創傷的工具，伴侶是救生圈。",
+            "家庭故事": "重視家庭功能與穩定，情感交流可能不是核心。",
+            "宗教故事": "將愛情神聖化，以信仰或理想化的方式對待伴侶。",
+            "遊戲故事": "視愛情為競賽，重視輸贏、策略與防衛。",
+            "旅行故事": "愛是一起探索與成長的旅程，重視共同前進。",
+            "園藝故事": "認為關係需要每天呵護經營，像照顧植物。",
+            "縫紉故事": "將兩個人的生活縫合，互相配合互補。",
+            "商業故事": "像合夥人，重視分工、職責與投資報酬率。",
+            "成癮故事": "極度依賴伴侶，沒有對方會感到焦慮恐慌。",
+            "幻想故事": "期待童話般完美的愛情，可能忽略現實。",
+            "歷史故事": "重視共同回憶與過去，關係是時間的延伸。",
+            "科學故事": "用理性、邏輯分析感情，試圖找出公式。",
+            "食譜故事": "認為愛情有標準程序，照著做就會幸福。",
+            "戰爭故事": "認為愛情轟轟烈烈，吵架是關心與在乎。",
+            "劇場故事": "關係像演戲，重視儀式感與場面。",
+            "幽默故事": "用輕鬆幽默化解問題，避免過度嚴肅。",
+            "神祕故事": "保持神祕感，讓對方慢慢探索自己。"
+        };
+
+        const warningStories = ["恐怖故事", "成癮故事", "警察故事", "遊戲故事"];
+
+        // ========== 動態產生測驗 ==========
+        const quizBody = document.getElementById('quizBody');
+        const answeredCountSpan = document.getElementById('answeredCount');
+        const progressBar = document.getElementById('progressBar');
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
+        const quizContainer = document.getElementById('quizContainer');
+        const retakeBtn = document.getElementById('retakeBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // 隨機排序函數
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // 產生題目 HTML（隨機排列，不顯示故事類型）
+        function renderQuiz() {
+            const shuffledQuestions = shuffleArray(questions);
+            let html = '';
+            shuffledQuestions.forEach((q, index) => {
+                const displayNum = index + 1;
+                html += `<div class="question-item" data-qid="${q.id}">`;
+                html += `<div class="question-text">${displayNum}. ${q.text}</div>`;
+                html += `<div class="options">`;
+                for (let val = 1; val <= 5; val++) {
+                    const labelText = ['非常不同意','不同意','普通','同意','非常同意'][val-1];
+                    html += `<label class="option-label" data-qid="${q.id}" data-val="${val}">`;
+                    html += `<input type="radio" name="q${q.id}" value="${val}"> ${labelText}`;
+                    html += `</label>`;
+                }
+                html += `</div></div>`;
+            });
+            quizBody.innerHTML = html;
+
+            document.querySelectorAll('.option-label').forEach(label => {
+                label.addEventListener('click', function(e) {
+                    const qid = this.dataset.qid;
+                    const val = this.dataset.val;
+                    document.querySelectorAll(`.option-label[data-qid="${qid}"]`).forEach(l => l.classList.remove('selected'));
+                    this.classList.add('selected');
+                    updateProgress();
+                });
+            });
+        }
+
+        // 更新進度
+        function updateProgress() {
+            const total = questions.length;
+            let answered = 0;
+            questions.forEach(q => {
+                const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+                if (selected) answered++;
+            });
+            answeredCountSpan.textContent = answered;
+            progressBar.style.width = (answered / total * 100) + '%';
+        }
+
+        // 重設測驗
+        function resetQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+            updateProgress();
+            resultSection.style.display = 'none';
+            quizContainer.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 計算結果
+        function calculateResults() {
+            const answers = {};
+            questions.forEach(q => {
+                const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+                answers[q.id] = selected ? parseInt(selected.value) : 3;
+            });
+
+            const storyScores = {};
+            const storyCounts = {};
+            questions.forEach(q => {
+                if (!storyScores[q.story]) {
+                    storyScores[q.story] = 0;
+                    storyCounts[q.story] = 0;
+                }
+                storyScores[q.story] += answers[q.id];
+                storyCounts[q.story]++;
+            });
+
+            const storyAverages = {};
+            Object.keys(storyScores).forEach(story => {
+                storyAverages[story] = storyScores[story] / storyCounts[story];
+            });
+
+            const categoryScores = {};
+            const categoryCounts = {};
+            questions.forEach(q => {
+                if (!categoryScores[q.category]) {
+                    categoryScores[q.category] = 0;
+                    categoryCounts[q.category] = 0;
+                }
+                categoryScores[q.category] += answers[q.id];
+                categoryCounts[q.category]++;
+            });
+            const categoryAverages = {};
+            Object.keys(categoryScores).forEach(cat => {
+                categoryAverages[cat] = categoryScores[cat] / categoryCounts[cat];
+            });
+
+            return { storyAverages, categoryAverages };
+        }
+
+        // 顯示結果
+        function showResults() {
+            const { storyAverages, categoryAverages } = calculateResults();
+            const sortedStories = Object.entries(storyAverages).sort((a,b) => b[1] - a[1]);
+            const topStories = sortedStories.slice(0, 5);
+
+            let html = '';
+            const categories = ["不對稱故事", "物件故事", "協作故事", "敘事故事", "類型故事"];
+            const categoryTitles = {
+                "不對稱故事": "🔀 不對稱故事（權力或角色不平等）",
+                "物件故事": "📦 物件故事（將伴侶或關係視為物件）",
+                "協作故事": "🤝 協作故事（關係是合作與配合）",
+                "敘事故事": "📖 敘事故事（愛情應遵循某種既定文本）",
+                "類型故事": "🎭 類型故事（強調互動模式與氣氛）"
+            };
+
+            html += `<div class="result-card"><h2>五大類愛情故事傾向</h2>`;
+            categories.forEach(cat => {
+                const avg = categoryAverages[cat] || 0;
+                const pct = (avg / 5 * 100).toFixed(0);
+                const color = getBarColor(avg);
+                html += `<div class="bar-row">
+                    <span class="bar-label">${cat}</span>
+                    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color};"></div></div>
+                    <span class="bar-value">${avg.toFixed(2)}</span>
+                </div>`;
+            });
+            html += `</div>`;
+
+            html += `<div class="result-card"><h2>你的主要愛情劇本（前5名）</h2>`;
+            topStories.forEach(([story, score]) => {
+                const desc = storyDescriptions[story] || '';
+                html += `<div class="story-result-item">
+                    <h3>${story} <span class="story-score">${score.toFixed(2)} / 5.00</span></h3>
+                    <p>${desc}</p>
+                </div>`;
+                if (warningStories.includes(story) && score >= 3.5) {
+                    html += `<div class="${story === '恐怖故事' ? 'danger-box' : 'warning-box'}">
+                        ⚠️ 你在此劇本的分數偏高，可能反映關係中有些值得留意的模式。建議進一步自我覺察，必要時尋求專業協助。
+                    </div>`;
+                }
+            });
+            html += `</div>`;
+
+            html += `<div class="result-card"><h2>完整故事分數一覽</h2>`;
+            sortedStories.forEach(([story, score]) => {
+                const pct = (score / 5 * 100).toFixed(0);
+                html += `<div class="bar-row">
+                    <span class="bar-label">${story}</span>
+                    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${getBarColor(score)};"></div></div>
+                    <span class="bar-value">${score.toFixed(2)}</span>
+                </div>`;
+            });
+            html += `</div>`;
+
+            resultContent.innerHTML = html;
+            resultSection.style.display = 'block';
+            quizContainer.style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function getBarColor(score) {
+            if (score >= 4) return '#00b894';
+            if (score >= 3) return '#6c5ce7';
+            if (score >= 2) return '#fdcb6e';
+            return '#e17055';
+        }
+
+        // 下載結果圖片
+        function downloadResultImage() {
+            if (typeof html2canvas === 'undefined') {
+                alert('圖片下載功能需要網路連線載入 html2canvas 庫，請確認網路後重試。');
+                return;
+            }
+            const element = document.getElementById('resultContent');
+            html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '愛情故事測驗結果.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error(err);
+                alert('圖片生成失敗，請稍後重試。');
+            });
+        }
+
+        submitBtn.addEventListener('click', function() {
+            let unanswered = 0;
+            questions.forEach(q => {
+                if (!document.querySelector(`input[name="q${q.id}"]:checked`)) unanswered++;
+            });
+            if (unanswered > 0) {
+                if (!confirm(`有 ${unanswered} 題尚未作答，未作答的題目將以「普通(3分)」計算。確定要繼續嗎？`)) {
+                    return;
+                }
+            }
+            showResults();
+        });
+
+        resetBtn.addEventListener('click', resetQuiz);
+        retakeBtn.addEventListener('click', resetQuiz);
+        downloadBtn.addEventListener('click', downloadResultImage);
+
+        renderQuiz();
+        updateProgress();
+    </script>
+</body>
+</html>
