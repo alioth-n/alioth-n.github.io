@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>60Hz Mains Digital Clock - 74LS90 / 7447 - Live Schematic</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:#070b1f;color:#dbe6ff;font-family:-apple-system,"Segoe UI",sans-serif}
+.bar{position:sticky;left:0;top:0;z-index:5;padding:8px 10px;background:#070b1f;border-bottom:1px solid #1c2a5a}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+button{border:0;border-radius:8px;padding:8px 11px;font-size:13px;background:#1c2a5a;color:#dbe6ff}
+button.p{background:#e0281d;color:#fff}button.a{background:#2f6fd6;color:#fff}
+.tm{font:700 22px ui-monospace,Menlo,monospace;color:#ff5a4a;margin:6px 0 2px;letter-spacing:2px}
+.st{font-size:13px;line-height:1.45;color:#bcd0ff;min-height:38px}
+.sc{overflow-x:auto;-webkit-overflow-scrolling:touch}
+svg{display:block;width:3150px;height:760px}
+.wr{fill:none;stroke:#26305a;stroke-width:3;stroke-linejoin:round}
+.wr.hi{stroke:#ff5a4a;filter:drop-shadow(0 0 3px #ff3b30);stroke-dasharray:3 8;stroke-linecap:round;animation:f .5s linear infinite}
+.wr.lo{stroke:#3f63c8}
+.wr.pw.hi{stroke:#ff9a4a;filter:drop-shadow(0 0 3px #ff7a2a)}
+@keyframes f{to{stroke-dashoffset:-11}}
+.c{fill:none;stroke:#3a4a8a;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bx{fill:#0d1330}
+.on .c{stroke:var(--lc,#ff9a4a);filter:drop-shadow(0 0 3px var(--lc,#ff9a4a))}
+.t{font-size:10.5px;fill:#6f80bd}.on .t{fill:#e6eeff}
+.n{font-size:8px;fill:#5566a5}
+.T{font-weight:700;font-size:14px;fill:#6f80bd}.on .T{fill:#fff}
+.h{font-size:16px;font-weight:700}
+.sg{fill:#1a2347}.sg.on{fill:#ff3b30;filter:drop-shadow(0 0 5px #ff3b30)}
+text{font-family:-apple-system,"Segoe UI",sans-serif}
+</style></head><body>
+<div class="bar"><div class="btns"><button class="p" id="pw">Power ON</button><button id="pf">Power OFF</button><button id="pz">Pause</button>
+<button class="a" id="v1">Slow: 1 half-cycle / step</button><button class="a" id="v2">1 s / tick</button><button class="a" id="v3">1 min / tick</button><button id="ps">Set 23:59:50</button></div>
+<div class="tm" id="tm">--:--:--</div><div class="st" id="st"></div></div>
+<div class="sc"><svg id="s" viewBox="0 0 3150 760"></svg></div>
+<script>
+const $=id=>document.getElementById(id);
+const P={},NETS=[];let h='';
+const gnd=(x,y)=>`<path class="c" d="M${x},${y} L${x},${y+6} M${x-10},${y+6} L${x+10},${y+6} M${x-6},${y+10} L${x+6},${y+10} M${x-2},${y+14} L${x+2},${y+14}"/>`;
+const bump=(x,y,n,sw)=>{let d=`M${x},${y}`;for(let i=0;i<n;i++)d+=` a5,5 0 0 ${sw} 0,10`;return d};
+const dio=(x,y,a)=>`<g transform="translate(${x},${y}) rotate(${a})"><polygon class="c" points="-6,-6 -6,6 5,0"/><line class="c" x1="6" y1="-6" x2="6" y2="6"/></g>`;
+const cap=(x,y)=>`<line class="c" x1="${x-12}" y1="${y}" x2="${x+12}" y2="${y}"/><line class="c" x1="${x-12}" y1="${y+8}" x2="${x+12}" y2="${y+8}"/>`;
+const tie=(side,x,y,t)=>{const s=side=='L'?-1:1;
+ if(t=='g')return`<path class="c" d="M${x},${y} L${x+s*6},${y} M${x+s*6},${y-6} L${x+s*6},${y+6} M${x+s*10},${y-4} L${x+s*10},${y+4} M${x+s*13},${y-2} L${x+s*13},${y+2}"/>`;
+ if(t=='+')return`<path class="c" d="M${x},${y} L${x+s*8},${y} M${x+s*8},${y-6} L${x+s*8},${y+6}"/>`;
+ return`<path class="c" d="M${x+s*3},${y-3} L${x+s*9},${y+3} M${x+s*9},${y-3} L${x+s*3},${y+3}"/>`};
+function ic(id,x,y,w,title,sub,L,R,ties,pitch){pitch=pitch||22;const hh=36+Math.max(L.length,R.length)*pitch+8;
+ let o=`<g id="${id}" style="--lc:#fff04a"><rect class="c bx" x="${x}" y="${y}" width="${w}" height="${hh}" rx="6"/><text class="T" x="${x+w/2}" y="${y+16}" text-anchor="middle">${title}</text><text class="t" x="${x+w/2}" y="${y+29}" text-anchor="middle">${sub}</text>`;
+ [[L,'L',x-14,x,x+6,'start',x-12],[R,'R',x+w+14,x+w,x+w-6,'end',x+w+4]].forEach(([A,sd,xe,xb,xt,an,xn])=>A.forEach((p,i)=>{const [nm,num]=p.split(':'),py=y+36+i*pitch;
+  o+=`<line class="c" x1="${xe}" y1="${py}" x2="${xb}" y2="${py}"/><text class="t" x="${xt}" y="${py+4}" text-anchor="${an}">${nm}</text><text class="n" x="${xn}" y="${py-3}">${num}</text>`;
+  P[id+'.'+nm]=[xe,py];if(ties&&ties[nm])o+=tie(sd,xe,py,ties[nm])}));
+ return o+'</g>'}
+// net: src, d1, routes [[dest,by,d2]], level fn
+function net(id,src,d1,routes,lvl,cls){const [sx,sy]=P[src];let d='';
+ routes.forEach(([dst,by,d2])=>{const [dx,dy]=P[dst],xa=sx+d1,xb=dx-d2;d+=`M${sx},${sy} L${xa},${sy} L${xa},${by} L${xb},${by} L${xb},${dy} L${dx},${dy} `});
+ h+=`<path id="n_${id}" class="wr ${cls||''}" d="${d}"/>`;if(routes.length>1)h+=`<circle cx="${sx}" cy="${sy}" r="3.5" fill="#6c8cff"/>`;NETS.push({id,lvl})}
+// ============ POWER SECTION ============
+const WP=[['hot','M24,64 L24,50 L100,50',1],['neu','M24,96 L24,110 L100,110',1],['sec1','M132,50 L150,50 L150,80 L175,80',2],['sec2','M132,110 L132,150 L280,150 L280,80 L235,80',2],['dcp','M205,50 L205,28 L310,28 L310,190 L240,190',3],['dcm','M205,110 L205,118',3],['c1w','M290,190 L290,225 M290,233 L290,245',4],['cinw','M262,190 L262,225 M262,233 L262,245',4],['pout','M180,190 L96,190',5],['c2w','M140,190 L140,225 M140,233 L140,245',5],['tap','M132,130 L70,130 L70,350 L80,350',6]];
+WP.forEach(([id,d,st])=>{h+=`<path id="w_${id}" class="wr pw" data-st="${st}" d="${d}" transform="translate(20,110)"/>`});
+h+=`<g transform="translate(20,110)">
+<g id="g_ac" data-st="1" style="--lc:#ff9a4a"><circle class="c bx" cx="24" cy="80" r="16"/><path class="c" d="M16,80 q4,-9 8,0 t8,0"/><text class="t" x="24" y="112" text-anchor="middle">110V/60Hz</text></g>
+<g id="g_fs" data-st="1"><rect class="c bx" x="40" y="45" width="22" height="10" rx="2"/><path class="c" d="M70,50 L90,50 M70,50 L86,40"/><text class="t" x="51" y="38" text-anchor="middle">F1</text><text class="t" x="80" y="38" text-anchor="middle">SW1</text></g>
+<g id="g_t" data-st="2"><path class="c" d="${bump(100,50,6,1)}"/><path class="c" d="${bump(132,50,6,0)}"/><line class="c" x1="114" y1="46" x2="114" y2="114"/><line class="c" x1="118" y1="46" x2="118" y2="114"/><text class="t" x="92" y="46" text-anchor="end">P1</text><text class="t" x="92" y="118" text-anchor="end">P2</text><text class="t" x="140" y="46">S1</text><text class="t" x="140" y="124">S2</text><text class="t" x="123" y="96" text-anchor="middle">T1</text><text class="t" x="123" y="140" text-anchor="middle" style="font-size:9px">9-12V AC</text></g>
+<g id="g_b" data-st="3"><polygon class="c bx" points="175,80 205,50 235,80 205,110"/>${dio(220,65,45)}${dio(220,95,-45)}${dio(190,65,-45)}${dio(190,95,45)}<text class="t" x="170" y="96" text-anchor="end">AC1</text><text class="t" x="240" y="96">AC2</text><text class="t" x="214" y="47">+</text><text class="t" x="214" y="124">-</text><text class="t" x="205" y="84" text-anchor="middle">BR1</text></g>
+<g id="g_gd" data-st="3" style="--lc:#ff9a4a">${gnd(205,118)}</g>
+<g id="g_c1" data-st="4">${cap(290,225)}${gnd(290,245)}<text class="t" x="302" y="223">+</text><text class="t" x="300" y="262">C1 1000uF</text></g>
+<g id="g_cin" data-st="4">${cap(262,225)}${gnd(262,245)}<text class="t" x="274" y="223">+</text><text class="t" x="250" y="262" text-anchor="end">Cin 0.33uF</text></g>
+<g id="g_r" data-st="5"><rect class="c bx" x="180" y="168" width="60" height="50" rx="5"/><text class="T" x="210" y="190" text-anchor="middle">7805</text><text class="t" x="186" y="212">OUT</text><text class="t" x="210" y="212" text-anchor="middle">GND</text><text class="t" x="234" y="212" text-anchor="end">IN</text>${gnd(210,218)}</g>
+<g id="g_c2" data-st="5">${cap(140,225)}${gnd(140,245)}<text class="t" x="152" y="223">+</text><text class="t" x="140" y="262" text-anchor="middle">Cout 0.1uF</text></g>
+<text class="t" x="96" y="184" text-anchor="end">+5V</text></g>
+<g id="g_tp" data-st="6"><text class="t" x="60" y="440">Tap before rectifier: 60Hz (not 120Hz)</text><rect class="c bx" x="100" y="454" width="34" height="12" rx="2"/><text class="t" x="117" y="448" text-anchor="middle">R1 10k</text>
+<line class="c" x1="170" y1="${460}" x2="170" y2="436"/>${dio(170,447,-90)}<path class="c" d="M164,426 L176,426 M170,426 L170,420"/><text class="t" x="180" y="444">D5 (to +5V)</text>
+<line class="c" x1="170" y1="460" x2="170" y2="490"/>${dio(170,475,-90)}${gnd(170,490)}<text class="t" x="180" y="480">D6 (to GND)</text></g>
+<path id="w_tapR" class="wr pw" data-st="6" d="M80,460 L216,460"/><path id="w_d5" class="wr pw" data-st="6" d="M170,460 L170,426"/><path id="w_d6" class="wr pw" data-st="6" d="M170,460 L170,490"/>
+<path id="w_tapx" class="wr pw" data-st="6" d="M90,240 L90,460 L100,460 M134,460 L160,460"/>`;
+// fix tap wire: transform tap placed at global coords from transformer S2
+// ============ TIMEBASE ============
+h+=ic('IC1',230,424,110,'74HC14','Hex Schmitt inverter',['1A:1','1Y:2','2A:3','2Y:4','3A:5','3Y:6','GND:7'],['VCC:14','6A:13','6Y:12','5A:11','5Y:10','4A:9','4Y:8'],{'3A':'g','3Y':'n','GND':'g','VCC':'+','6A':'g','6Y':'n','5A':'g','5Y':'n','4A':'g','4Y':'n'});
+h+=`<text class="h" x="30" y="92" fill="#ff9a4a">1) Power: AC -> +5V</text><text class="h" x="60" y="410" fill="#fff04a">2) Timebase: 60Hz -> Schmitt -> CLK60</text><text class="h" x="760" y="92" fill="#36e0ff">3) 74LS90 chain: /10 /6 (60Hz->1Hz) then SS, MM, HH</text><text class="h" x="1560" y="92" fill="#5cff9a">4) 7447 + common-anode display (M1, M10, H1, H10)</text>
+<text x="1500" y="40" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">60Hz Mains Digital Clock</text><text x="1500" y="62" text-anchor="middle" font-size="13" fill="#8fa0d8">Transformer - bridge - 7805 - Schmitt trigger - 74LS90 x8 - 74LS08 (24h reset) - 7447 x4 - common-anode 7-seg</text>`;
+// ============ COUNTERS ============
+const UX=[760,950,1140,1330,1560,1960,2360,2760],T=['10','6','10','6','10','6','10','10'];
+const SUB=['60Hz /10','/6 -> 1Hz','sec ones','sec tens','min ones M1','min tens M10','hour ones H1','hour tens H10'];
+UX.forEach((x,i)=>{const r0=(i==1||i==3||i==5)?{}:(i>=6?{}:{'R0(1)':'g','R0(2)':'g'});
+ h+=ic('U'+(i+1),x,130,110,'74LS90 U'+(i+1),(T[i]=='6'?'/6 ':'/10 ')+SUB[i],['INA:14','INB:1','R0(1):2','R0(2):3','R9(1):6','R9(2):7','VCC:5'],['QA:12','QB:9','QC:8','QD:11','GND:10','NC:4','NC:13'],Object.assign({'R9(1)':'g','R9(2)':'g','VCC':'+','GND':'g','NC':'n'},r0))});
+h+=ic('AND',2560,130,110,'74LS08','AND: RESET24 = H10.QB & H1.QC',['1A:1','1B:2','2A:4','2B:5','3A:9','3B:10','GND:7'],['1Y:3','2Y:6','3Y:8','4Y:11','4A:12','4B:13','VCC:14'],{'2A':'g','2B':'g','3A':'g','3B':'g','GND':'g','2Y':'n','3Y':'n','4Y':'n','4A':'g','4B':'g','VCC':'+'});
+// ============ 7447 + DISPLAYS ============
+const SEG47=['abcdef','bc','abdeg','abcdg','bcfg','acdfg','cdefg','abc','abcdefg','abcfg'],SG='abcdefg';
+const DN=['M1','M10','H1','H10'];
+[4,5,6,7].forEach((i,k)=>{const x=UX[i],xd=x+200;
+ h+=ic('V'+k,x,420,110,'7447 '+DN[k],'BCD -> 7-seg (active low)',['B:1','C:2','LT:3','BI/RBO:4','RBI:5','D:6','A:7','GND:8'],['VCC:16','f:15','g:14','a:13','b:12','c:11','d:10','e:9'],{'LT':'+','BI/RBO':'+','RBI':'+','GND':'g','VCC':'+'});
+ h+=ic('D'+k,xd,420,130,'DISPLAY '+DN[k],'common anode 5161AS',['COM:3','f:9','g:10','a:7','b:6','c:4','d:2','e:1','dp:5'],[],{COM:'+',dp:'n'});
+ h+=`<g id="D${k}b" transform="translate(${xd+34},482)">`+Object.entries({a:'12,4 16,0 48,0 52,4 48,8 16,8',b:'56,10 60,14 60,50 56,54 52,50 52,14',c:'56,60 60,64 60,100 56,104 52,100 52,64',d:'12,104 16,100 48,100 52,104 48,108 16,108',e:'4,60 8,64 8,100 4,104 0,100 0,64',f:'4,10 8,14 8,50 4,54 0,50 0,14',g:'12,54 16,50 48,50 52,54 48,58 16,58'}).map(([c,p])=>`<polygon id="sg${k}${c}" class="sg" points="${p}"/>`).join('')+'</g>';
+ SG.split('').forEach((c,j)=>h+=`<g id="R${k}${c}" data-st="5"><rect class="c bx" x="${x+136}" y="${456+22*('fgabcde'.indexOf(c)+1)-5}" width="30" height="10" rx="2"/><text class="n" x="${x+151}" y="${456+22*('fgabcde'.indexOf(c)+1)-8}" text-anchor="middle">330</text></g>`)});
+$('s').innerHTML=h;
+// ============ SIMULATION ============
+let st=[...Array(8)].map(()=>({a:0,n:0})),s=0,clk=0,paused=false,spd=1,flash=0,tk=0;
+const bit=(i,q)=>q=='QA'?st[i].a:q=='QB'?st[i].n&1:q=='QC'?(st[i].n>>1)&1:st[i].n>>2;
+const dv=i=>st[i].a+(st[i].n<<1);
+const rst24=()=>(st[7].n&1)&&((st[6].n>>1)&1)?1:0;
+const on5=f=>()=>s>=5?f():-1;
+let nb=0;const nx=()=>330+3*(nb++);
+UX.forEach((x,i)=>{const U='U'+(i+1),nxt='U'+(i+2),k=i-4,disp=i>=4,db=(j,idx)=>[ 'V'+k+'.'+['B','C','D','A'][j],392+5*idx,[18,22,38,42][j]];
+ const q=(n)=>on5(()=>bit(i,n));
+ net(U+'QA',U+'.QA',10,[[U+'.INB',120,22]].concat(disp?[['V'+k+'.A',392+5*0,42]]:[]),q('QA'));
+ net(U+'QB',U+'.QB',18,[].concat(T[i]=='6'?[[U+'.R0(1)',nx(),30]]:[],disp?[['V'+k+'.B',392+5*1,18]]:[],i==7?[['AND.1B',nx(),20]]:[]),q('QB'));
+ net(U+'QC',U+'.QC',26,[].concat(T[i]=='6'?[[U+'.R0(2)',nx(),34],[nxt+'.INA',nx(),22]]:[],disp?[['V'+k+'.C',392+5*2,22]]:[],i==6?[['AND.1A',nx(),20]]:[]),q('QC'));
+ net(U+'QD',U+'.QD',34,[].concat(T[i]=='10'&&i<7?[[nxt+'.INA',nx(),22]]:[],disp?[['V'+k+'.D',392+5*3,38]]:[]),q('QD'));
+});
+// remove empty nets' paths (no routes) harmlessly handled by empty d
+net('RST',"AND.1Y",14,[['U8.R0(1)',166,20],['U8.R0(2)',166,20],['U7.R0(1)',nx(),30],['U7.R0(2)',nx(),34]],on5(rst24));
+[0,1,2,3].forEach(k=>{[...SG].forEach((c,j)=>{net('V'+k+c,'V'+k+'.'+c,0,[['D'+k+'.'+c,P['V'+k+'.'+c][1],0]],on5(()=>SEG47[dv(k+4)].includes(c)?0:1))})});
+net('CLK60','IC1.2Y',-30,[['U1.INA',640,26]],()=>s>=6?clk:(s>=5?0:-1));
+h2=`<path id="n_inv" class="wr" d="M216,482 L196,482 L196,504 L216,504"/><path id="n_a" class="wr" d="M160,460 L216,460"/>`;
+$('s').insertAdjacentHTML('beforeend',h2);
+NETS.push({id:'inv',lvl:()=>s>=6?(clk?0:1):-1},{id:'a',lvl:()=>s>=6?clk:-1});
+// rebuild svg with net paths
+$('s').innerHTML=h;$('s').insertAdjacentHTML('beforeend',h2);
+const D=['AC mains 110V/60Hz goes through fuse F1 and switch SW1 into transformer primary P1/P2.','Secondary S1/S2 delivers about 9-12V AC (above 7V so the 7805 has headroom).','Bridge BR1 rectifies both half-cycles; DC+ on top, DC- to ground.','C1 smooths the ripple; Cin sits at the 7805 input for high-frequency filtering.','7805 outputs a stable +5V; Cout filters the output. Every VCC pin now has power.','The 60Hz AC is tapped BEFORE the rectifier (a full-wave rectifier would give 120Hz). R1 limits current; D5/D6 clamp the input; the 74HC14 Schmitt trigger squares it up into CLK60.','CLK60 drives U1 (/10) then U2 (/6) = 1Hz, then seconds, minutes, hours. The 74LS90 triggers on falling edges; the carry is QD (/10) or QC (/6).'];
+const WSET=document.querySelectorAll('[data-st]');
+function digitRand(i){const m=T[i]=='6'?5:9;const d=Math.floor(Math.random()*(m+1));return{a:d&1,n:d>>1}}
+function randInit(){for(let i=0;i<6;i++)st[i]=digitRand(i);const hh=Math.floor(Math.random()*24);st[6]={a:(hh%10)&1,n:(hh%10)>>1};st[7]={a:Math.floor(hh/10)&1,n:Math.floor(hh/10)>>1}}
+function setT(H,M,S){const d=v=>({a:v&1,n:v>>1});st[0]=d(0);st[1]=d(0);st[2]=d(S%10);st[3]=d(Math.floor(S/10));st[4]=d(M%10);st[5]=d(Math.floor(M/10));st[6]=d(H%10);st[7]=d(Math.floor(H/10))}
+function fix(i){if(T[i]=='6'&&(st[i].n&1)&&((st[i].n>>1)&1)){st[i].a=0;st[i].n=0}
+ if(i>=6&&rst24()){st[6]={a:0,n:0};st[7]={a:0,n:0};flash=25}}
+function inc(i){if(i>7)return;const o=st[i],pc=(o.n>>1)&1,pd=o.n>>2;o.a^=1;if(!o.a)o.n=(o.n+1)%5;fix(i);const nc=(o.n>>1)&1,nd=o.n>>2;
+ if(T[i]=='6'){if(pc&&!nc)inc(i+1)}else if(pd&&!nd)inc(i+1)}
+function half(){clk^=1;if(!clk)inc(0)}
+function render(){
+ WSET.forEach(e=>{const on=s>=+e.dataset.st;if(e.tagName=='path'){e.setAttribute('class','wr pw'+(on?/^w_(tap|d5|d6)/.test(e.id)?(clk?' hi':' lo'):' hi':''))}else e.classList.toggle('on',on)});
+ ['IC1','AND'].forEach(k=>$(k).classList.toggle('on',s>=5));for(let i=1;i<=8;i++)$('U'+i).classList.toggle('on',s>=5);
+ for(let k=0;k<4;k++){$('V'+k).classList.toggle('on',s>=5);$('D'+k).classList.toggle('on',s>=5)}
+ NETS.forEach(n=>{const e=$('n_'+n.id);if(!e)return;const l=n.lvl();e.setAttribute('class','wr'+(l==1?' hi':l==0?' lo':''))});
+ for(let k=0;k<4;k++)for(const c of SG){const lit=s>=5&&SEG47[dv(k+4)].includes(c);$('sg'+k+c).classList.toggle('on',lit)}
+ const t=x=>''+dv(x);$('tm').textContent=s>=5?`${t(7)}${t(6)}:${t(5)}${t(4)}:${t(3)}${t(2)}`:'--:--:--';
+ $('st').textContent=(s==0?'Press Power ON. Drag left/right to see the whole circuit. Red flowing = logic 1, blue = logic 0, grey = no power.':s<7?D[s-1]:D[6])+(flash>0?'  >>> RESET24 = 1: U7+U8 cleared (24:00 -> 00:00)':'');}
+function tick(){if(paused)return;tk++;if(s>0&&s<7&&tk%4==0){s++;if(s==5){randInit();clk=0}}
+ if(s>=6)for(let j=0;j<[1,120,7200][spd];j++)half();if(flash>0)flash--;render()}
+$('pw').onclick=()=>{s=1;tk=0;clk=0;paused=false;$('pz').textContent='Pause';render()};
+$('pf').onclick=()=>{s=0;clk=0;render()};
+$('pz').onclick=()=>{paused=!paused;$('pz').textContent=paused?'Resume':'Pause'};
+$('v1').onclick=()=>spd=0;$('v2').onclick=()=>spd=1;$('v3').onclick=()=>spd=2;
+$('ps').onclick=()=>{if(s>=5){setT(23,59,50);spd=1;render()}};
+setInterval(tick,200);render();
+</script></body></html>
